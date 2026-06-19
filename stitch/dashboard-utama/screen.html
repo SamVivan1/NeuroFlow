@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NeuroFlow - Dashboard Utama</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#62fae3",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-container-low": "#f5f3f4",
+                        "outline-variant": "#c5c6cd",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface-container-highest": "#e4e2e3",
+                        "primary": "#091426",
+                        "error": "#ba1a1a",
+                        "secondary": "#006b5f",
+                        "secondary-fixed-dim": "#3cddc7",
+                        "on-surface": "#1b1b1d",
+                        "on-primary-container": "#8590a6",
+                        "tertiary-fixed": "#ffddb8",
+                        "tertiary-container": "#3c2300",
+                        "surface-container": "#f0edef",
+                        "surface-tint": "#545f73",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d8e3fb",
+                        "primary-fixed-dim": "#bcc7de",
+                        "on-tertiary-container": "#c88000",
+                        "on-surface-variant": "#45474c",
+                        "on-secondary-container": "#007165",
+                        "surface-variant": "#e4e2e3",
+                        "on-secondary-fixed": "#00201c",
+                        "surface": "#fbf8fa",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fbf8fa",
+                        "surface-container-high": "#eae7e9",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#005047",
+                        "inverse-on-surface": "#f3f0f2",
+                        "secondary-container": "#62fae3",
+                        "inverse-primary": "#bcc7de",
+                        "inverse-surface": "#303032",
+                        "on-primary-fixed": "#111c2d",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1e293b",
+                        "surface-bright": "#fbf8fa",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "on-background": "#1b1b1d",
+                        "outline": "#75777d",
+                        "tertiary": "#201100",
+                        "surface-dim": "#dcd9db",
+                        "tertiary-fixed-dim": "#ffb95f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "touch-target-min": "48px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "stack-gap": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Atkinson Hyperlegible Next"],
+                        "headline-md": ["Atkinson Hyperlegible Next"],
+                        "stats-display": ["Atkinson Hyperlegible Next"],
+                        "label-lg": ["Inter"],
+                        "headline-lg": ["Atkinson Hyperlegible Next"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "stats-display": ["48px", {"lineHeight": "48px", "fontWeight": "700"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .status-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
+        .breath-ring {
+            animation: breathe 4s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface shadow-sm w-full top-0 flex justify-between items-center px-gutter py-4 w-full z-50 fixed">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="signal_cellular_alt">signal_cellular_alt</span>
+<h1 class="font-headline-md text-headline-md-mobile text-primary">NeuroFlow</h1>
+</div>
+<div class="flex items-center gap-2 bg-secondary-container px-4 py-1.5 rounded-full">
+<span class="material-symbols-outlined text-on-secondary-container text-sm status-pulse" style="font-variation-settings: 'FILL' 1;">circle</span>
+<span class="font-label-lg text-on-secondary-container text-label-lg">ESP32 Connected</span>
+</div>
+<button class="active:scale-95 transition-transform hover:opacity-80">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="watch">watch</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-gutter max-w-2xl mx-auto space-y-6">
+<!-- Welcome Message -->
+<section>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Halo, Selamat Pagi</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Mari pantau kondisi fisik Anda hari ini.</p>
+</section>
+<!-- Bento Grid Sections -->
+<div class="grid grid-cols-1 gap-6">
+<!-- Heart Rate & Stress Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(42,23,0,0.05)] border-2 border-transparent hover:border-secondary-fixed transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="bg-primary-container p-3 rounded-lg text-on-primary">
+<span class="material-symbols-outlined" data-icon="monitor_heart">monitor_heart</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Detak Jantung &amp; Stres</h3>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-lg text-label-lg">Normal</span>
+</div>
+<div class="flex items-baseline gap-2 mb-6">
+<span class="font-stats-display text-stats-display text-primary">72</span>
+<span class="font-body-lg text-body-lg text-on-surface-variant">BPM</span>
+</div>
+<!-- Heart Rate Mini Graph Visualizer -->
+<div class="w-full h-16 flex items-end gap-1 mb-2">
+<div class="bg-secondary-fixed-dim w-full h-1/2 rounded-t-sm"></div>
+<div class="bg-secondary-fixed-dim w-full h-2/3 rounded-t-sm"></div>
+<div class="bg-secondary-fixed-dim w-full h-1/3 rounded-t-sm"></div>
+<div class="bg-secondary-fixed w-full h-3/4 rounded-t-sm"></div>
+<div class="bg-secondary-fixed-dim w-full h-1/2 rounded-t-sm"></div>
+<div class="bg-secondary-fixed-dim w-full h-5/6 rounded-t-sm"></div>
+<div class="bg-secondary-fixed w-full h-1/2 rounded-t-sm"></div>
+</div>
+</div>
+<!-- Tremor Intensity Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_12px_rgba(42,23,0,0.05)] border-2 border-transparent hover:border-secondary-fixed transition-all">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="bg-primary-container p-3 rounded-lg text-on-primary">
+<span class="material-symbols-outlined" data-icon="precision_manufacturing">precision_manufacturing</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Intensitas Tremor</h3>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="info">info</span>
+<span class="font-label-lg text-label-lg">MPU6050</span>
+</div>
+</div>
+<div class="mt-4">
+<div class="flex justify-between items-end mb-2">
+<span class="font-headline-md text-headline-md text-secondary">Rendah</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Stabil</span>
+</div>
+<!-- Custom Progress Bar -->
+<div class="w-full bg-surface-container h-6 rounded-full overflow-hidden border-2 border-surface-container-high">
+<div class="bg-secondary h-full rounded-full transition-all duration-1000" style="width: 25%;"></div>
+</div>
+<div class="flex justify-between mt-2 font-label-lg text-label-lg text-outline">
+<span>Low</span>
+<span>Moderate</span>
+<span>High</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Calm Button -->
+<section class="mt-8">
+<button class="w-full bg-primary text-on-primary min-h-[72px] rounded-xl flex items-center justify-between px-8 py-4 shadow-lg active:scale-95 transition-all group overflow-hidden relative">
+<div class="flex items-center gap-4 z-10">
+<div class="breath-ring bg-secondary-fixed-dim/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-3xl" data-icon="air">air</span>
+</div>
+<div class="text-left">
+<span class="block font-headline-md text-headline-md">Quick Calm</span>
+<span class="block font-label-lg text-label-lg opacity-80">Mulai pernapasan terpandu</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-3xl z-10 group-hover:translate-x-2 transition-transform" data-icon="chevron_right">chevron_right</span>
+<!-- Background Decorative Element -->
+<div class="absolute right-0 top-0 bottom-0 w-32 bg-secondary-fixed opacity-10 skew-x-[-20deg] translate-x-12"></div>
+</button>
+</section>
+<!-- Clinical Context Visual -->
+<section class="mt-12 rounded-2xl overflow-hidden relative h-48 flex items-center p-8 bg-primary">
+<div class="relative z-10 max-w-[60%]">
+<h4 class="font-headline-md text-headline-md text-on-primary mb-2">Catatan Harian</h4>
+<p class="font-body-md text-body-md text-on-primary-container">"Kondisi Anda hari ini 15% lebih stabil dibandingkan kemarin."</p>
+</div>
+<img alt="Doctor reviewing medical data" class="absolute inset-0 w-full h-full object-cover opacity-40" data-alt="A professional medical setting showing a close-up of a doctor's hand holding a high-tech tablet displaying heart rate and brain activity graphs. The lighting is soft and natural, emphasizing a clinical yet compassionate mood. The background is a blurred modern hospital interior with clean white and soft teal accents, creating a calm and supportive atmosphere for patient care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG2pQVLrMlHLf0VUFEKvEcwW-FgnyZ3OrxZqfq0TyKx8aELjbd-9JUOuCL_0nXIEUOS-wKVX9e_wDykQmuXK-lmU6UNywV_J3VSMO0jlv_bOrUPeBx4Kcjrl0W03UF9Yu4hFP9SX-fGlej5AXnc8Rl6RI3fOtj1OkmLQ9F5STIf5z1fH2io2ERUr0B8CFgOFCzvJM6OteUWvRt1a8990c0kaCG59tixTqV3HIZHMt7yhD-AmPU8arXa2MJaAqtP5-ElmPIjoWvv_s"/>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<!-- Dash (Active) -->
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 min-h-touch-target-min active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="monitor_heart" style="font-variation-settings: 'FILL' 1;">monitor_heart</span>
+<span class="font-label-lg text-label-lg">Dash</span>
+</button>
+<!-- Breathe -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 min-h-touch-target-min hover:bg-surface-container-high active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="air">air</span>
+<span class="font-label-lg text-label-lg">Breathe</span>
+</button>
+<!-- Reports -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 min-h-touch-target-min hover:bg-surface-container-high active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-label-lg text-label-lg">Reports</span>
+</button>
+<!-- Settings -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 min-h-touch-target-min hover:bg-surface-container-high active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction: Update heart rate randomly for realism
+        const hrDisplay = document.querySelector('.text-stats-display');
+        if (hrDisplay) {
+            setInterval(() => {
+                const current = parseInt(hrDisplay.innerText);
+                const change = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+                const nextHr = Math.max(68, Math.min(85, current + change));
+                hrDisplay.innerText = nextHr;
+            }, 3000);
+        }
+
+        // Haptic-like interaction on card press
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

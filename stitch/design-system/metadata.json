@@ -1,0 +1,132 @@
+{
+  "designSystems": [
+    {
+      "name": "assets/455b1022fc7546c2902f8bfac1714718",
+      "designSystem": {
+        "displayName": "NeuroFlow",
+        "styleGuidelines": "## Brand & Style\n\nThis design system is engineered for patients managing Parkinson's disease, prioritizing cognitive ease, physical accessibility, and emotional stability. The brand personality is **Clinical yet Compassionate**, bridging the gap between medical-grade data and human wellness. \n\nThe aesthetic follows a **Refined Minimalism** approach. By utilizing generous whitespace and a restricted visual vocabulary, the interface minimizes cognitive load and \"visual noise\" that can be overstimulating. The emotional response is one of \"Guided Calm\"\u2014users should feel in control, safe, and supported. Every interaction is designed to accommodate tremors or limited fine motor skills through high-contrast affordances and oversized interactive zones.\n\n## Layout & Spacing\n\nThe layout utilizes a **Fluid Grid** with exaggerated safe areas. To accommodate Parkinson's-related motor challenges, the spacing system prioritizes \"Fitts's Law\": larger targets are easier to hit.\n\n- **Touch Targets:** A strict minimum of 48x48px for all interactive elements, with a preferred 56px height for primary actions.\n- **Negative Space:** Use 24px gutters to prevent \"fat-finger\" errors where a user might accidentally trigger a neighboring button.\n- **Alignment:** Consistent left-alignment is used across all views to provide a predictable anchor point for the eye.\n\n## Elevation & Depth\n\nThis design system uses **Tonal Layers** combined with **Ambient Shadows** to define hierarchy. \n\n- **Level 0 (Background):** The base light gray surface.\n- **Level 1 (Cards):** White surfaces with a soft, diffused shadow (12px blur, 5% opacity, Slate Blue tint). These house the primary content.\n- **Level 2 (Active Elements):** Elements currently being interacted with or \"Global Action Buttons\" use a slightly deeper shadow to appear physically \"lifted\" toward the user, providing a clear tactile metaphor.\n\nAvoid complex gradients or heavy textures; depth should feel airy and light.\n\n## Components\n\n### Buttons\nPrimary buttons are full-width on mobile to maximize hit area. They use the Deep Slate Blue background with White text. Secondary buttons use a Soft Teal outline (2px) to denote \"calm\" or \"positive\" progression.\n\n### Cards\nCards are the primary container for biofeedback data (e.g., tremor frequency, heart rate). They must feature a \"High Contrast\" header and at least 16px of internal padding to ensure content does not feel cramped.\n\n### Input Fields\nInputs must have a persistent 2px border in a neutral Slate. When focused, the border thickens and changes to Soft Teal. Labels are always visible (never placeholder-only) to assist with short-term memory and cognitive focus.\n\n### Haptic Feedback Progress Bars\nUnique to this design system, progress bars and \"Live Biofeedback\" rings should use the Soft Teal-to-Coral color spectrum. They should be accompanied by clear numerical data in the `stats-display` type style for dual-encoding (color + value).\n\n### Lists\nList items feature a minimum height of 64px and include a chevron icon to signal \"tappability,\" providing clear affordance for users with reduced tactile sensitivity.",
+        "theme": {
+          "colorMode": "LIGHT",
+          "font": "ATKINSON_HYPERLEGIBLE_NEXT",
+          "roundness": "ROUND_EIGHT",
+          "customColor": "#1e293b",
+          "headlineFont": "ATKINSON_HYPERLEGIBLE_NEXT",
+          "bodyFont": "INTER",
+          "labelFont": "INTER",
+          "namedColors": {
+            "background": "#fbf8fa",
+            "error": "#ba1a1a",
+            "error_container": "#ffdad6",
+            "inverse_on_surface": "#f3f0f2",
+            "inverse_primary": "#bcc7de",
+            "inverse_surface": "#303032",
+            "on_background": "#1b1b1d",
+            "on_error": "#ffffff",
+            "on_error_container": "#93000a",
+            "on_primary": "#ffffff",
+            "on_primary_container": "#8590a6",
+            "on_primary_fixed": "#111c2d",
+            "on_primary_fixed_variant": "#3c475a",
+            "on_secondary": "#ffffff",
+            "on_secondary_container": "#007165",
+            "on_secondary_fixed": "#00201c",
+            "on_secondary_fixed_variant": "#005047",
+            "on_surface": "#1b1b1d",
+            "on_surface_variant": "#45474c",
+            "on_tertiary": "#ffffff",
+            "on_tertiary_container": "#c88000",
+            "on_tertiary_fixed": "#2a1700",
+            "on_tertiary_fixed_variant": "#653e00",
+            "outline": "#75777d",
+            "outline_variant": "#c5c6cd",
+            "primary": "#091426",
+            "primary_container": "#1e293b",
+            "primary_fixed": "#d8e3fb",
+            "primary_fixed_dim": "#bcc7de",
+            "secondary": "#006b5f",
+            "secondary_container": "#62fae3",
+            "secondary_fixed": "#62fae3",
+            "secondary_fixed_dim": "#3cddc7",
+            "surface": "#fbf8fa",
+            "surface_bright": "#fbf8fa",
+            "surface_container": "#f0edef",
+            "surface_container_high": "#eae7e9",
+            "surface_container_highest": "#e4e2e3",
+            "surface_container_low": "#f5f3f4",
+            "surface_container_lowest": "#ffffff",
+            "surface_dim": "#dcd9db",
+            "surface_tint": "#545f73",
+            "surface_variant": "#e4e2e3",
+            "tertiary": "#201100",
+            "tertiary_container": "#3c2300",
+            "tertiary_fixed": "#ffddb8",
+            "tertiary_fixed_dim": "#ffb95f"
+          },
+          "designMd": "---\nname: NeuroFlow\ncolors:\n  surface: '#fbf8fa'\n  surface-dim: '#dcd9db'\n  surface-bright: '#fbf8fa'\n  surface-container-lowest: '#ffffff'\n  surface-container-low: '#f5f3f4'\n  surface-container: '#f0edef'\n  surface-container-high: '#eae7e9'\n  surface-container-highest: '#e4e2e3'\n  on-surface: '#1b1b1d'\n  on-surface-variant: '#45474c'\n  inverse-surface: '#303032'\n  inverse-on-surface: '#f3f0f2'\n  outline: '#75777d'\n  outline-variant: '#c5c6cd'\n  surface-tint: '#545f73'\n  primary: '#091426'\n  on-primary: '#ffffff'\n  primary-container: '#1e293b'\n  on-primary-container: '#8590a6'\n  inverse-primary: '#bcc7de'\n  secondary: '#006b5f'\n  on-secondary: '#ffffff'\n  secondary-container: '#62fae3'\n  on-secondary-container: '#007165'\n  tertiary: '#201100'\n  on-tertiary: '#ffffff'\n  tertiary-container: '#3c2300'\n  on-tertiary-container: '#c88000'\n  error: '#ba1a1a'\n  on-error: '#ffffff'\n  error-container: '#ffdad6'\n  on-error-container: '#93000a'\n  primary-fixed: '#d8e3fb'\n  primary-fixed-dim: '#bcc7de'\n  on-primary-fixed: '#111c2d'\n  on-primary-fixed-variant: '#3c475a'\n  secondary-fixed: '#62fae3'\n  secondary-fixed-dim: '#3cddc7'\n  on-secondary-fixed: '#00201c'\n  on-secondary-fixed-variant: '#005047'\n  tertiary-fixed: '#ffddb8'\n  tertiary-fixed-dim: '#ffb95f'\n  on-tertiary-fixed: '#2a1700'\n  on-tertiary-fixed-variant: '#653e00'\n  background: '#fbf8fa'\n  on-background: '#1b1b1d'\n  surface-variant: '#e4e2e3'\ntypography:\n  headline-lg:\n    fontFamily: Atkinson Hyperlegible Next\n    fontSize: 32px\n    fontWeight: '700'\n    lineHeight: 40px\n    letterSpacing: -0.02em\n  headline-lg-mobile:\n    fontFamily: Atkinson Hyperlegible Next\n    fontSize: 26px\n    fontWeight: '700'\n    lineHeight: 32px\n  headline-md:\n    fontFamily: Atkinson Hyperlegible Next\n    fontSize: 24px\n    fontWeight: '600'\n    lineHeight: 32px\n  body-lg:\n    fontFamily: Inter\n    fontSize: 18px\n    fontWeight: '400'\n    lineHeight: 28px\n  body-md:\n    fontFamily: Inter\n    fontSize: 16px\n    fontWeight: '400'\n    lineHeight: 24px\n  label-lg:\n    fontFamily: Inter\n    fontSize: 14px\n    fontWeight: '600'\n    lineHeight: 20px\n    letterSpacing: 0.05em\n  stats-display:\n    fontFamily: Atkinson Hyperlegible Next\n    fontSize: 48px\n    fontWeight: '700'\n    lineHeight: 48px\nrounded:\n  sm: 0.25rem\n  DEFAULT: 0.5rem\n  md: 0.75rem\n  lg: 1rem\n  xl: 1.5rem\n  full: 9999px\nspacing:\n  touch-target-min: 48px\n  gutter: 24px\n  margin-mobile: 20px\n  margin-desktop: 64px\n  stack-gap: 16px\n---\n\n## Brand & Style\n\nThis design system is engineered for patients managing Parkinson's disease, prioritizing cognitive ease, physical accessibility, and emotional stability. The brand personality is **Clinical yet Compassionate**, bridging the gap between medical-grade data and human wellness. \n\nThe aesthetic follows a **Refined Minimalism** approach. By utilizing generous whitespace and a restricted visual vocabulary, the interface minimizes cognitive load and \"visual noise\" that can be overstimulating. The emotional response is one of \"Guided Calm\"\u2014users should feel in control, safe, and supported. Every interaction is designed to accommodate tremors or limited fine motor skills through high-contrast affordances and oversized interactive zones.\n\n## Colors\n\nThe palette is rooted in medical reliability and physiological signaling:\n- **Primary (Deep Slate Blue):** Used for core navigation, text, and structural elements to establish authority and trust.\n- **Success/Calm (Soft Teal):** Represents healthy biofeedback ranges and \"rest\" states. It provides a soothing counterpoint to the darker primary tones.\n- **Warning (Warm Amber):** Used for mild stress detection or notifications requiring attention without causing panic.\n- **Alert (Coral):** Reserved for high-stress indicators or critical biometric alerts, ensuring immediate visibility through high chromatic contrast against the light background.\n\nThe background uses a \"Cool Gray\" wash (#F8FAFC) rather than pure white to reduce glare, which can be taxing for users with light sensitivity.\n\n## Typography\n\nAccessibility is the primary driver for typography. We utilize **Atkinson Hyperlegible Next** for headlines and data displays; its character differentiation is specifically designed to increase legibility for users with visual impairments. **Inter** is used for body copy to maintain a clean, systematic feel.\n\n**Key Rules:**\n- **Minimum Size:** No functional text should fall below 14px.\n- **Contrast:** Maintain a minimum 4.5:1 ratio for all body text.\n- **Line Height:** Generous leading (1.5x for body) ensures that lines of text are easily trackable even if the device is moving slightly due to tremors.\n\n## Layout & Spacing\n\nThe layout utilizes a **Fluid Grid** with exaggerated safe areas. To accommodate Parkinson's-related motor challenges, the spacing system prioritizes \"Fitts's Law\": larger targets are easier to hit.\n\n- **Touch Targets:** A strict minimum of 48x48px for all interactive elements, with a preferred 56px height for primary actions.\n- **Negative Space:** Use 24px gutters to prevent \"fat-finger\" errors where a user might accidentally trigger a neighboring button.\n- **Alignment:** Consistent left-alignment is used across all views to provide a predictable anchor point for the eye.\n\n## Elevation & Depth\n\nThis design system uses **Tonal Layers** combined with **Ambient Shadows** to define hierarchy. \n\n- **Level 0 (Background):** The base light gray surface.\n- **Level 1 (Cards):** White surfaces with a soft, diffused shadow (12px blur, 5% opacity, Slate Blue tint). These house the primary content.\n- **Level 2 (Active Elements):** Elements currently being interacted with or \"Global Action Buttons\" use a slightly deeper shadow to appear physically \"lifted\" toward the user, providing a clear tactile metaphor.\n\nAvoid complex gradients or heavy textures; depth should feel airy and light.\n\n## Shapes\n\nThe shape language is **Soft and Approachable**. A standard 0.5rem (8px) corner radius is applied to most containers to eliminate the perceived \"sharpness\" of medical software. \n\n- **Primary Buttons:** Use `rounded-xl` (1.5rem) to create a friendly, pill-like appearance that invites interaction.\n- **Selection Indicators:** Use `rounded-lg` (1rem) for checkboxes and radio containers to make them feel like distinct, touchable \"tiles\" rather than small abstract icons.\n\n## Components\n\n### Buttons\nPrimary buttons are full-width on mobile to maximize hit area. They use the Deep Slate Blue background with White text. Secondary buttons use a Soft Teal outline (2px) to denote \"calm\" or \"positive\" progression.\n\n### Cards\nCards are the primary container for biofeedback data (e.g., tremor frequency, heart rate). They must feature a \"High Contrast\" header and at least 16px of internal padding to ensure content does not feel cramped.\n\n### Input Fields\nInputs must have a persistent 2px border in a neutral Slate. When focused, the border thickens and changes to Soft Teal. Labels are always visible (never placeholder-only) to assist with short-term memory and cognitive focus.\n\n### Haptic Feedback Progress Bars\nUnique to this design system, progress bars and \"Live Biofeedback\" rings should use the Soft Teal-to-Coral color spectrum. They should be accompanied by clear numerical data in the `stats-display` type style for dual-encoding (color + value).\n\n### Lists\nList items feature a minimum height of 64px and include a chevron icon to signal \"tappability,\" providing clear affordance for users with reduced tactile sensitivity.",
+          "colorVariant": "FIDELITY",
+          "overridePrimaryColor": "#1e293b",
+          "overrideSecondaryColor": "#2dd4bf",
+          "overrideTertiaryColor": "#f59e0b",
+          "spacingScale": 2,
+          "typography": {
+            "body-lg": {
+              "fontFamily": "Inter",
+              "fontSize": "18px",
+              "fontWeight": "400",
+              "lineHeight": "28px"
+            },
+            "body-md": {
+              "fontFamily": "Inter",
+              "fontSize": "16px",
+              "fontWeight": "400",
+              "lineHeight": "24px"
+            },
+            "headline-lg": {
+              "fontFamily": "Atkinson Hyperlegible Next",
+              "fontSize": "32px",
+              "fontWeight": "700",
+              "lineHeight": "40px",
+              "letterSpacing": "-0.02em"
+            },
+            "headline-lg-mobile": {
+              "fontFamily": "Atkinson Hyperlegible Next",
+              "fontSize": "26px",
+              "fontWeight": "700",
+              "lineHeight": "32px"
+            },
+            "headline-md": {
+              "fontFamily": "Atkinson Hyperlegible Next",
+              "fontSize": "24px",
+              "fontWeight": "600",
+              "lineHeight": "32px"
+            },
+            "label-lg": {
+              "fontFamily": "Inter",
+              "fontSize": "14px",
+              "fontWeight": "600",
+              "lineHeight": "20px",
+              "letterSpacing": "0.05em"
+            },
+            "stats-display": {
+              "fontFamily": "Atkinson Hyperlegible Next",
+              "fontSize": "48px",
+              "fontWeight": "700",
+              "lineHeight": "48px"
+            }
+          },
+          "spacing": {
+            "gutter": "24px",
+            "margin-desktop": "64px",
+            "margin-mobile": "20px",
+            "stack-gap": "16px",
+            "touch-target-min": "48px"
+          },
+          "headlineFontFamily": "Atkinson Hyperlegible Next",
+          "bodyFontFamily": "Inter",
+          "labelFontFamily": "Inter"
+        }
+      },
+      "version": "1"
+    }
+  ]
+}

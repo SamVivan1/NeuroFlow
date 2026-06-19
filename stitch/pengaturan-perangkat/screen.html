@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NeuroFlow - Pengaturan &amp; Koneksi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#62fae3",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-container-low": "#f5f3f4",
+                    "outline-variant": "#c5c6cd",
+                    "on-tertiary-fixed": "#2a1700",
+                    "surface-container-highest": "#e4e2e3",
+                    "primary": "#091426",
+                    "error": "#ba1a1a",
+                    "secondary": "#006b5f",
+                    "secondary-fixed-dim": "#3cddc7",
+                    "on-surface": "#1b1b1d",
+                    "on-primary-container": "#8590a6",
+                    "tertiary-fixed": "#ffddb8",
+                    "tertiary-container": "#3c2300",
+                    "surface-container": "#f0edef",
+                    "surface-tint": "#545f73",
+                    "on-primary": "#ffffff",
+                    "primary-fixed": "#d8e3fb",
+                    "primary-fixed-dim": "#bcc7de",
+                    "on-tertiary-container": "#c88000",
+                    "on-surface-variant": "#45474c",
+                    "on-secondary-container": "#007165",
+                    "surface-variant": "#e4e2e3",
+                    "on-secondary-fixed": "#00201c",
+                    "surface": "#fbf8fa",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#fbf8fa",
+                    "surface-container-high": "#eae7e9",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#005047",
+                    "inverse-on-surface": "#f3f0f2",
+                    "secondary-container": "#62fae3",
+                    "inverse-primary": "#bcc7de",
+                    "inverse-surface": "#303032",
+                    "on-primary-fixed": "#111c2d",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#1e293b",
+                    "surface-bright": "#fbf8fa",
+                    "on-primary-fixed-variant": "#3c475a",
+                    "on-background": "#1b1b1d",
+                    "outline": "#75777d",
+                    "tertiary": "#201100",
+                    "surface-dim": "#dcd9db",
+                    "tertiary-fixed-dim": "#ffb95f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "touch-target-min": "48px",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "stack-gap": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Atkinson Hyperlegible Next"],
+                    "headline-md": ["Atkinson Hyperlegible Next"],
+                    "stats-display": ["Atkinson Hyperlegible Next"],
+                    "label-lg": ["Inter"],
+                    "headline-lg": ["Atkinson Hyperlegible Next"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "stats-display": ["48px", {"lineHeight": "48px", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .active-nav-pill {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        background: #006b5f;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 4px solid #ffffff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .custom-toggle:checked + .toggle-bg {
+        background-color: #006b5f;
+      }
+      .custom-toggle:checked + .toggle-bg .toggle-dot {
+        transform: translateX(20px);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-container-high shadow-sm w-full top-0 flex justify-between items-center px-gutter py-4 w-full z-50 sticky">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" style="font-size: 28px;">signal_cellular_alt</span>
+<h1 class="font-headline-md text-headline-md-mobile text-primary dark:text-inverse-primary">NeuroFlow</h1>
+</div>
+<button class="active:scale-95 transition-transform hover:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 28px;">watch</span>
+</button>
+</header>
+<main class="px-gutter pt-8 max-w-2xl mx-auto space-y-8">
+<!-- Section Header -->
+<section>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-2">Pengaturan</h2>
+<p class="text-on-surface-variant font-body-md">Kelola perangkat Anda dan personalisasi pengalaman terapi.</p>
+</section>
+<!-- Device Card -->
+<section class="space-y-4">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Perangkat Terhubung</h3>
+<div class="bg-surface-container-lowest border-2 border-outline-variant/30 rounded-xl p-6 shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-size: 32px;">magic_button</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md">Wristband ESP32</h4>
+<div class="flex items-center gap-4 mt-1">
+<span class="flex items-center gap-1 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">battery_full</span>
+                                85%
+                            </span>
+<span class="flex items-center gap-1 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">signal_cellular_4_bar</span>
+                                Kuat
+                            </span>
+</div>
+</div>
+</div>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+</div>
+<div class="relative overflow-hidden rounded-xl h-40 bg-surface-container-high">
+<img alt="Wristband Device" class="w-full h-full object-cover opacity-60 mix-blend-multiply" data-alt="A macro cinematic shot of a high-tech sleek electronic wristband device on a minimalist white table. The device features subtle glowing blue lights indicating a heart rate monitor. The lighting is soft and clinical, with a cool blue and slate gray color palette that evokes a sense of medical precision and modern calmness. Shadows are soft and diffused, matching the refined minimalist UI style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8GRSwH6flk4S4ArH0kXDnxUDTWZKr9pnvIzFy5dp5jquOhmZvs4fDe_7w3guIR6F4Wt3jRe_Y9lmU0_VLfoxSZHEUpFYdGnYenKrloTKVw_89BBBnc_CvKYMO-too5rxp65OvTz_L52AwcTEesNVNx3J--CEJ4xK737z6hjd_0C8Mp2p5e0iDOZBPcQgbMf22Q1c44NAAx0W3blCzOnGb-HKYpiRYRt_TtozYxKdsk1yqwN6TxaSeCzUB786sFWU-j-1l5HgLnoE"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<button class="bg-primary text-on-primary px-6 py-3 rounded-full font-label-lg shadow-lg active:scale-95 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined">add</span>
+                    Tambah Perangkat Baru
+                 </button>
+</div>
+</div>
+</section>
+<!-- Haptic Settings Card -->
+<section class="space-y-4">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Pengaturan Haptic</h3>
+<div class="bg-surface-container-lowest border-2 border-outline-variant/30 rounded-xl p-6 shadow-sm space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h4 class="font-headline-md text-headline-md mb-1">Intensitas Getaran Cue</h4>
+<p class="text-on-surface-variant font-body-md">Sensivitas pengingat gerakan (metronome)</p>
+</div>
+<span class="text-secondary font-headline-md" id="intensity-label">Medium</span>
+</div>
+<div class="space-y-4 px-2">
+<input class="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-secondary" max="3" min="1" oninput="document.getElementById('intensity-label').innerText = ['Soft', 'Medium', 'Strong'][this.value-1]" step="1" type="range" value="2"/>
+<div class="flex justify-between text-on-surface-variant font-label-lg">
+<span>Soft</span>
+<span>Medium</span>
+<span>Strong</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Notifications Card -->
+<section class="space-y-4">
+<h3 class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider">Notifikasi &amp; Peringatan</h3>
+<div class="bg-surface-container-lowest border-2 border-outline-variant/30 rounded-xl overflow-hidden shadow-sm divide-y divide-outline-variant/20">
+<!-- Toggle Item 1 -->
+<label class="flex items-center justify-between p-6 cursor-pointer hover:bg-surface-container-lowest/50 transition-colors">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-size: 24px;">medication</span>
+<div>
+<span class="font-body-lg text-body-lg block">Pengingat Obat</span>
+<span class="text-on-surface-variant font-body-md">Ingatkan jadwal minum Levodopa</span>
+</div>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="custom-toggle absolute block w-0 h-0 opacity-0 cursor-pointer" type="checkbox"/>
+<div class="toggle-bg block w-12 h-7 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-dot absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform shadow-sm"></div>
+</div>
+</div>
+</label>
+<!-- Toggle Item 2 -->
+<label class="flex items-center justify-between p-6 cursor-pointer hover:bg-surface-container-lowest/50 transition-colors">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-size: 24px;">warning</span>
+<div>
+<span class="font-body-lg text-body-lg block">Peringatan Stres</span>
+<span class="text-on-surface-variant font-body-md">Deteksi otomatis tremor saat cemas</span>
+</div>
+</div>
+<div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+<input class="custom-toggle absolute block w-0 h-0 opacity-0 cursor-pointer" type="checkbox"/>
+<div class="toggle-bg block w-12 h-7 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-dot absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform shadow-sm"></div>
+</div>
+</div>
+</label>
+<!-- List Item (Language) -->
+<div class="flex items-center justify-between p-6 cursor-pointer hover:bg-surface-container-lowest/50 transition-colors">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-size: 24px;">language</span>
+<div>
+<span class="font-body-lg text-body-lg block">Bahasa</span>
+<span class="text-on-surface-variant font-body-md">Indonesia</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="pb-12">
+<button class="w-full py-4 rounded-xl border-2 border-error/20 text-error font-headline-md active:bg-error/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">logout</span>
+                Keluar Akun
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface dark:bg-surface-container shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<!-- Dash -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 min-h-touch-target-min hover:bg-surface-container-high rounded-xl active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1">monitor_heart</span>
+<span class="font-label-lg text-label-lg">Dash</span>
+</a>
+<!-- Breathe -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 min-h-touch-target-min hover:bg-surface-container-high rounded-xl active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1">air</span>
+<span class="font-label-lg text-label-lg">Breathe</span>
+</a>
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 min-h-touch-target-min hover:bg-surface-container-high rounded-xl active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1">query_stats</span>
+<span class="font-label-lg text-label-lg">Reports</span>
+</a>
+<!-- Settings (ACTIVE) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-2 min-h-touch-target-min active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-lg text-label-lg">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple haptic feedback simulation
+        const slider = document.querySelector('input[type="range"]');
+        slider.addEventListener('change', () => {
+            // Visualize a "pulse" when setting changes
+            const card = slider.closest('div.bg-surface-container-lowest');
+            card.classList.add('ring-2', 'ring-secondary/30');
+            setTimeout(() => card.classList.remove('ring-2', 'ring-secondary/30'), 300);
+            
+            if (window.navigator.vibrate) {
+                const intensity = parseInt(slider.value) * 50;
+                window.navigator.vibrate(intensity);
+            }
+        });
+
+        // Toggle logic visual interaction
+        const toggles = document.querySelectorAll('.custom-toggle');
+        toggles.forEach(t => {
+            t.addEventListener('change', function() {
+                const label = this.closest('label');
+                if(this.checked) {
+                    label.classList.add('bg-secondary-fixed/5');
+                } else {
+                    label.classList.remove('bg-secondary-fixed/5');
+                }
+            });
+        });
+    </script>
+</body></html>
