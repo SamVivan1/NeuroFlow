@@ -10,7 +10,7 @@ frontend/*.yarn/*
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+.gitignore
 # testing
 frontend/coverage
 
