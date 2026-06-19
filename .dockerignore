@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.vscode
+.next
+dist
+build
+.env.local
+.env.*.local
+*.md
+firmware
+stitch
+.antigravitycli
