@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <WiFiManager.h>
 #include <Wire.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
@@ -7,9 +8,8 @@
 #include <PubSubClient.h>
 
 // ==================== KONFIGURASI SISTEM ====================
-// Kredensial Jaringan
-const char* ssid             = "D9_TP";
-const char* password         = "03100412";
+// Kredensial Wi-Fi sekarang disimpan oleh WiFiManager, tidak hardcoded.
+WiFiManager wifiManager;
 
 // Broker MQTT (Sesuaikan dengan backend Firebase/AWS/Public Broker Anda)
 const char* mqtt_broker      = "broker.hivemq.com"; 
@@ -59,12 +59,22 @@ int stressThreshold = 80;
 void setupWiFi() {
   delay(10);
   Serial.println("\n[WiFi] Menghubungkan ke Jaringan...");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+
+  WiFi.mode(WIFI_STA);
+  wifiManager.setConfigPortalTimeout(180);
+
+  if (!wifiManager.autoConnect("NeuroFlow-AP")) {
+    Serial.println("\n[WiFi] Gagal koneksi WiFi, restart perangkat...");
+    delay(3000);
+    ESP.restart();
+    return;
   }
+
   Serial.println("\n[WiFi] Terhubung!");
+  Serial.print("[WiFi] SSID: ");
+  Serial.println(WiFi.SSID());
+  Serial.print("[WiFi] IP   : ");
+  Serial.println(WiFi.localIP());
 }
 
 void applyCommandSettings(const char* payload, unsigned int length) {
