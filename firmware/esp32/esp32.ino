@@ -23,7 +23,10 @@ const unsigned long CALIBRATION_MS     = 5000;
 const unsigned long SAMPLE_INTERVAL_MS = 20;   // 50Hz
 const unsigned long TELEMETRY_INTERVAL = 1000; // 1 Detik
 const unsigned long MQTT_RETRY_INTERVAL= 5000; // Coba ulang MQTT setiap 5 detik (Non-blocking)
-const unsigned long IDLE_TIMEOUT_MS    = 5000; // 5 Menit (300.000 ms) untuk Deep Sleep
+const unsigned long IDLE_TIMEOUT_MS    = 10000; // 5 Menit (300.000 ms) untuk Deep Sleep
+
+// Boot Button For Reset WiFi Settings
+const int RESET_PIN = 0; // Misal pakai pin BOOT pada ESP32
 
 // --- Activity Detection (Tetap berjalan di background untuk MQTT) ---
 #define ACTIVITY_WINDOW_SIZE  50    
@@ -520,6 +523,7 @@ void goToDeepSleep() {
 void setup() {
   Serial.begin(115200);
   while (!Serial) delay(10);
+  pinMode(RESET_PIN, INPUT_PULLUP);
 
   // Cek apakah bangun dari Deep Sleep karena pergerakan
   esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
@@ -589,7 +593,11 @@ void setup() {
 // ==================== MAIN LOOP ====================
 void loop() {
   unsigned long currentTime = millis();
-
+  if (digitalRead(RESET_PIN) == LOW) {
+    Serial.println("\n[INFO] Reset WiFi diperintahkan...");
+    wifiManager.resetSettings(); // Menghapus kredensial yang tersimpan
+    ESP.restart(); // Restart ESP32
+  }
   handleMQTTConnection(currentTime);
 
   // 1. BLOK DETEKSI TREMOR & AKTIVITAS (50Hz)
