@@ -6,7 +6,8 @@
 #include "MAX30105.h"
 #include "heartRate.h" 
 #include <PubSubClient.h>
-#include <U8g2lib.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 // ==================== KONFIGURASI SISTEM ====================
 WiFiManager wifiManager;
@@ -58,7 +59,7 @@ const int ADC_MAX_VALUE = 4095;
 const float ADC_REFERENCE = 3.3;
 const float BATTERY_CALIBRATION_FACTOR = 1.133; 
 
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 22, 21);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &I2C_BUS, OLED_RESET);
 bool oledAvailable = false;
 
 Adafruit_MPU6050 mpu;
@@ -120,38 +121,15 @@ const char* getActivityLabel() {
 
 void oledPrintLines(const char* line1, const char* line2 = "", const char* line3 = "", const char* line4 = "") {
   if (!oledAvailable) return;
-  u8g2.clearBuffer();
-  u8g2.setFont(u8g2_font_7x14_tr);
-  u8g2.drawStr(0, 12, line1);
-  if (line2[0]) u8g2.drawStr(0, 26, line2);
-  if (line3[0]) u8g2.drawStr(0, 40, line3);
-  if (line4[0]) u8g2.drawStr(0, 54, line4);
-  u8g2.sendBuffer();
-}
-
-void drawWifiIcon(int x, int y, bool connected) {
-  u8g2.drawDisc(x + 6, y + 4, 2);
-  u8g2.drawDisc(x + 6, y + 4, 4);
-  if (connected) {
-    u8g2.drawDisc(x + 6, y + 4, 6);
-  } else {
-    u8g2.drawLine(x + 1, y + 1, x + 11, y + 7);
-    u8g2.drawLine(x + 11, y + 1, x + 1, y + 7);
-  }
-  u8g2.drawBox(x + 2, y + 5, 8, 2);
-}
-
-void drawBatteryIcon(int x, int y, int pct) {
-  int fill = pct > 0 ? map(constrain(pct, 0, 100), 0, 100, 1, 14) : 0;
-  u8g2.drawFrame(x, y, 18, 10);
-  u8g2.drawBox(x + 18, y + 3, 2, 4);
-  if (fill > 0) u8g2.drawBox(x + 2, y + 2, fill, 6);
-}
-
-void drawHeartIcon(int x, int y) {
-  u8g2.drawDisc(x + 4, y + 4, 3);
-  u8g2.drawDisc(x + 10, y + 4, 3);
-  u8g2.drawTriangle(x + 2, y + 6, x + 14, y + 6, x + 8, y + 14);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println(line1);
+  if (line2[0]) display.println(line2);
+  if (line3[0]) display.println(line3);
+  if (line4[0]) display.println(line4);
+  display.display();
 }
 
 void setupWiFi() {
@@ -211,53 +189,64 @@ void handleMQTTConnection(unsigned long now) {
 // ==================== TAMPILAN OLED BARU ====================
 void oledShowMainScreen(const char* netStatus, float battVolt, int battPct, int hr, float tremor, int stress) {
   if (!oledAvailable) return;
-  u8g2.clearBuffer();
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
 
-  bool connected = (strcmp(netStatus, "MQTT OK") == 0);
-  u8g2.setFont(u8g2_font_7x14_tr);
-  u8g2.drawStr(2, 12, netStatus);
-  drawWifiIcon(2, 18, connected);
-  drawBatteryIcon(98, 4, battPct);
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print(netStatus); 
+  
+  char battBuf[16];
+  snprintf(battBuf, sizeof(battBuf), "%d%% %.1fV", battPct, battVolt);
+  int16_t x, y; uint16_t w, h;
+  display.getTextBounds(battBuf, 0, 0, &x, &y, &w, &h);
+  display.setCursor(SCREEN_WIDTH - w, 0);
+  display.print(battBuf);
+  
+  display.drawLine(0, 10, SCREEN_WIDTH, 10, SSD1306_WHITE);
 
-  char battPctStr[6];
-  snprintf(battPctStr, sizeof(battPctStr), "%d%%", battPct);
-  u8g2.drawStr(104, 22, battPctStr);
+  display.setCursor(0, 15);
+  display.setTextSize(1);
+  display.print("HEART RATE:");
 
-  u8g2.drawHLine(0, 22, SCREEN_WIDTH);
-  u8g2.setFont(u8g2_font_7x14_tr);
-  u8g2.drawStr(2, 34, "HEART RATE");
-
+  display.setCursor(0, 26);
   if (!fingerPresent) {
-    u8g2.setFont(u8g2_font_6x10_tr);
-    u8g2.drawStr(2, 50, "-> Pasang Gelang <-");
+    display.setTextSize(1);
+    display.print("-> Pasang Gelang <-");
   } else if (!warmupDone) {
     unsigned long elapsed = millis() - fingerDetectedTime;
     int remain = (WARMUP_MS > elapsed) ? ((WARMUP_MS - elapsed) / 1000) + 1 : 0;
-    char warm[16];
-    snprintf(warm, sizeof(warm), "WARM %ds", remain);
-    u8g2.setFont(u8g2_font_helvB18_tr);
-    u8g2.drawStr(2, 50, warm);
+    
+    display.setTextSize(2);
+    display.print("WARM: ");
+    display.print(remain);
+    display.print("s");
   } else {
-    char bpmStr[8];
-    if (hr > 0) snprintf(bpmStr, sizeof(bpmStr), "%d", hr);
-    else strcpy(bpmStr, "--");
-    drawHeartIcon(2, 28);
-    u8g2.setFont(u8g2_font_fub14_tr);
-    u8g2.drawStr(22, 48, bpmStr);
-    u8g2.setFont(u8g2_font_6x10_tr);
-    u8g2.drawStr(80, 48, "BPM");
+    display.setTextSize(2);
+    if (hr > 0) {
+      display.print(hr);
+      display.setTextSize(1);
+      display.print(" BPM");
+    } else {
+      display.print("-- BPM");
+    }
   }
 
-  u8g2.drawHLine(0, 54, SCREEN_WIDTH);
-  u8g2.setFont(u8g2_font_6x10_tr);
-  char tremorStr[16];
-  snprintf(tremorStr, sizeof(tremorStr), "TREMOR %.2f", tremor);
-  u8g2.drawStr(2, 63, tremorStr);
-  char stressStr[16];
-  snprintf(stressStr, sizeof(stressStr), "STRESS %d%%", stress);
-  u8g2.drawStr(72, 63, stressStr);
+  display.drawLine(0, 44, SCREEN_WIDTH, 44, SSD1306_WHITE);
 
-  u8g2.sendBuffer();
+  display.setTextSize(1);
+  display.setCursor(0, 48);
+  display.print("TREMOR");
+  display.setCursor(0, 57);
+  display.print(tremor, 2);
+
+  display.setCursor(70, 48);
+  display.print("STRESS");
+  display.setCursor(70, 57);
+  display.print(stress); 
+  display.print(" %");
+
+  display.display();
 }
 
 float readBatteryVoltage() {
@@ -464,9 +453,9 @@ void goToDeepSleep() {
   
   // 1. Matikan Layar OLED
   if (oledAvailable) {
-    u8g2.clearBuffer();
-    u8g2.sendBuffer();
-    u8g2.setPowerSave(1);
+    display.clearDisplay();
+    display.display();
+    display.ssd1306_command(SSD1306_DISPLAYOFF);
   }
   
   // 2. Putuskan WiFi & Update Status MQTT
@@ -508,13 +497,13 @@ void setup() {
 
   I2C_BUS.begin(21, 22, 400000);
 
-  if (!u8g2.begin()) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("[OLED] GAGAL!");
     oledAvailable = false;
   } else {
     oledAvailable = true;
-    u8g2.clearBuffer();
-    u8g2.sendBuffer();
+    display.clearDisplay();
+    display.display();
   }
 
   if (!mpu.begin(0x68, &I2C_BUS)) {
