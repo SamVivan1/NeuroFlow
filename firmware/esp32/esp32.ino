@@ -112,6 +112,8 @@ bool alertsEnabled = true;
 float tremorThreshold = 0.40;
 int stressThreshold = 80;
 
+void configModeCallback(WiFiManager *myWiFiManager);
+
 const char* getActivityLabel() {
   switch (currentActivity) {
     case ACTIVITY_DIAM:  return "STATIONARY";
@@ -182,6 +184,23 @@ void drawActivityIcon(int x, int y) {
   }
 }
 
+
+void configModeCallback(WiFiManager *myWiFiManager)
+{
+  if (!oledAvailable) return;
+
+  u8g2.clearBuffer();
+  drawWifiIcon(56,10,false);
+
+  u8g2.setFont(u8g2_font_6x10_tr);
+  u8g2.drawStr(34,38,"SETUP WIFI");
+
+  u8g2.setFont(u8g2_font_5x7_tr);
+  u8g2.drawStr(28,52,"NeuroFlow-AP");
+
+  u8g2.sendBuffer();
+}
+
 void setupWiFi() {
   delay(10);
   Serial.println("\n[WiFi] Menghubungkan...");
@@ -202,6 +221,7 @@ void setupWiFi() {
 
   WiFi.mode(WIFI_STA);
   wifiManager.setConfigPortalTimeout(180);
+  wifiManager.setAPCallback(configModeCallback);
 
   if (!wifiManager.autoConnect("NeuroFlow-AP")) {
     Serial.println("\n[WiFi] Gagal, restart...");
@@ -470,7 +490,14 @@ void initHistoryBuffer() {
 
 void jalankanKalibrasi() {
   Serial.println("\n=== MEMULAI KALIBRASI MPU6050 ===");
-  oledPrintLines("Kalibrasi MPU6050", "Harap Diam...", "Tunggu...", "5 Detik");
+  if(oledAvailable){
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_logisoso18_tf);
+    u8g2.drawStr(54,42,"5");
+    u8g2.setFont(u8g2_font_6x10_tr);
+    u8g2.drawStr(36,58,"CALIBRATE");
+    u8g2.sendBuffer();
+  }
   
   float sumMag = 0;
   int sampleCount = 0;
