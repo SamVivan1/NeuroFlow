@@ -130,34 +130,72 @@ void oledPrintLines(const char* line1, const char* line2 = "", const char* line3
 }
 
 void drawWifiIcon(int x, int y, bool connected) {
-  u8g2.drawDisc(x + 6, y + 4, 2);
-  u8g2.drawDisc(x + 6, y + 4, 4);
-  if (connected) {
-    u8g2.drawDisc(x + 6, y + 4, 6);
-  } else {
-    u8g2.drawLine(x + 1, y + 1, x + 11, y + 7);
-    u8g2.drawLine(x + 11, y + 1, x + 1, y + 7);
+  u8g2.drawPixel(x + 8, y + 12);
+  u8g2.drawLine(x + 6, y + 10, x + 10, y + 10);
+  u8g2.drawLine(x + 5, y + 8,  x + 11, y + 8);
+  u8g2.drawLine(x + 3, y + 6,  x + 13, y + 6);
+  u8g2.drawLine(x + 1, y + 4,  x + 15, y + 4);
+  if (!connected) {
+    u8g2.drawLine(x + 2, y + 14, x + 14, y + 2);
   }
-  u8g2.drawBox(x + 2, y + 5, 8, 2);
 }
 
 void drawBatteryIcon(int x, int y, int pct) {
-  int fill = pct > 0 ? map(constrain(pct, 0, 100), 0, 100, 1, 14) : 0;
-  u8g2.drawFrame(x, y, 18, 10);
-  u8g2.drawBox(x + 18, y + 3, 2, 4);
-  if (fill > 0) u8g2.drawBox(x + 2, y + 2, fill, 6);
+  u8g2.drawFrame(x, y, 18, 9);
+  u8g2.drawBox(x + 18, y + 2, 2, 4);
+  int bars = map(constrain(pct,0,100),0,100,0,4);
+  if (bars >= 1) u8g2.drawBox(x+2 ,y+2,3,5);
+  if (bars >= 2) u8g2.drawBox(x+6 ,y+2,3,5);
+  if (bars >= 3) u8g2.drawBox(x+10,y+2,3,5);
+  if (bars >= 4) u8g2.drawBox(x+14,y+2,2,5);
 }
 
-void drawHeartIcon(int x, int y) {
-  u8g2.drawDisc(x + 4, y + 4, 3);
-  u8g2.drawDisc(x + 10, y + 4, 3);
-  u8g2.drawTriangle(x + 2, y + 6, x + 14, y + 6, x + 8, y + 14);
+void drawHeartIcon(int x,int y){
+  u8g2.drawDisc(x+3,y+3,3);
+  u8g2.drawDisc(x+9,y+3,3);
+  u8g2.drawTriangle(x,y+4,x+12,y+4,x+6,y+12);
+}
+
+
+void drawActivityIcon(int x, int y) {
+  switch (currentActivity) {
+    case ACTIVITY_DIAM: u8g2.drawDisc(x + 4, y + 4, 3); break;
+    case ACTIVITY_JALAN:
+      u8g2.drawCircle(x + 4, y + 2, 2);
+      u8g2.drawLine(x + 4, y + 4, x + 4, y + 9);
+      u8g2.drawLine(x + 4, y + 6, x + 1, y + 8);
+      u8g2.drawLine(x + 4, y + 6, x + 7, y + 5);
+      u8g2.drawLine(x + 4, y + 9, x + 2, y + 12);
+      u8g2.drawLine(x + 4, y + 9, x + 7, y + 12);
+      break;
+    case ACTIVITY_LARI:
+      u8g2.drawCircle(x + 4, y + 2, 2);
+      u8g2.drawLine(x + 4, y + 4, x + 7, y + 7);
+      u8g2.drawLine(x + 7, y + 7, x + 10, y + 5);
+      u8g2.drawLine(x + 7, y + 7, x + 5, y + 11);
+      u8g2.drawLine(x + 5, y + 11, x + 2, y + 13);
+      u8g2.drawLine(x + 5, y + 11, x + 9, y + 13);
+      break;
+  }
 }
 
 void setupWiFi() {
   delay(10);
   Serial.println("\n[WiFi] Menghubungkan...");
-  oledPrintLines("WiFi Status:", "Connecting...", "Check NeuroFlow-AP", "On Your Phone");
+  if(oledAvailable){
+    u8g2.clearBuffer();
+    u8g2.setFont(u8g2_font_logisoso16_tf);
+    u8g2.drawStr(18,28,"Neuro");
+    u8g2.drawStr(42,52,"Flow");
+    u8g2.sendBuffer();
+    delay(1000);
+
+    u8g2.clearBuffer();
+    drawWifiIcon(56,18,false);
+    u8g2.setFont(u8g2_font_6x10_tr);
+    u8g2.drawStr(34,54,"CONNECTING");
+    u8g2.sendBuffer();
+}
 
   WiFi.mode(WIFI_STA);
   wifiManager.setConfigPortalTimeout(180);
@@ -209,54 +247,43 @@ void handleMQTTConnection(unsigned long now) {
 }
 
 // ==================== TAMPILAN OLED BARU ====================
-void oledShowMainScreen(const char* netStatus, float battVolt, int battPct, int hr, float tremor, int stress) {
+void oledShowMainScreen(const char* netStatus,float battVolt,int battPct,int hr,float tremor,int stress) {
   if (!oledAvailable) return;
   u8g2.clearBuffer();
-
-  bool connected = (strcmp(netStatus, "MQTT OK") == 0);
-  u8g2.setFont(u8g2_font_7x14_tr);
-  u8g2.drawStr(2, 12, netStatus);
-  drawWifiIcon(2, 18, connected);
-  drawBatteryIcon(98, 4, battPct);
-
-  char battPctStr[6];
-  snprintf(battPctStr, sizeof(battPctStr), "%d%%", battPct);
-  u8g2.drawStr(104, 22, battPctStr);
-
-  u8g2.drawHLine(0, 22, SCREEN_WIDTH);
-  u8g2.setFont(u8g2_font_7x14_tr);
-  u8g2.drawStr(2, 34, "HEART RATE");
-
+  bool connected = (strcmp(netStatus,"MQTT OK")==0);
+  drawWifiIcon(2,0,connected);
+    drawBatteryIcon(105,3,battPct);
+  char battStr[8];
+  sprintf(battStr,"%d%%",battPct);
+  u8g2.setFont(u8g2_font_5x7_tr);
+  u8g2.drawStr(78,11,battStr);
+  u8g2.drawHLine(0,18,128);
   if (!fingerPresent) {
-    u8g2.setFont(u8g2_font_6x10_tr);
-    u8g2.drawStr(2, 50, "-> Pasang Gelang <-");
+      drawHeartIcon(55,23);
+      u8g2.setFont(u8g2_font_6x10_tr);
+      u8g2.drawStr(35,50,"NO SIGNAL");
   } else if (!warmupDone) {
-    unsigned long elapsed = millis() - fingerDetectedTime;
-    int remain = (WARMUP_MS > elapsed) ? ((WARMUP_MS - elapsed) / 1000) + 1 : 0;
-    char warm[16];
-    snprintf(warm, sizeof(warm), "WARM %ds", remain);
-    u8g2.setFont(u8g2_font_helvB18_tr);
-    u8g2.drawStr(2, 50, warm);
+      unsigned long elapsed = millis()-fingerDetectedTime;
+      int remain = (WARMUP_MS > elapsed) ? ((WARMUP_MS-elapsed)/1000)+1 : 0;
+      char txt[8]; sprintf(txt,"%d",remain);
+      u8g2.setFont(u8g2_font_logisoso24_tf);
+      int w=u8g2.getStrWidth(txt);
+      u8g2.drawStr((128-w)/2,48,txt);
   } else {
-    char bpmStr[8];
-    if (hr > 0) snprintf(bpmStr, sizeof(bpmStr), "%d", hr);
-    else strcpy(bpmStr, "--");
-    drawHeartIcon(2, 28);
-    u8g2.setFont(u8g2_font_fub14_tr);
-    u8g2.drawStr(22, 48, bpmStr);
-    u8g2.setFont(u8g2_font_6x10_tr);
-    u8g2.drawStr(80, 48, "BPM");
+      char bpmStr[8];
+      if(hr>0) sprintf(bpmStr,"%d",hr); else strcpy(bpmStr,"--");
+      drawHeartIcon(25,24);
+      u8g2.setFont(u8g2_font_logisoso24_tf);
+      u8g2.drawStr(48,48,bpmStr);
+      u8g2.setFont(u8g2_font_5x7_tr);
+      u8g2.drawStr(50,60,"BPM");
   }
-
-  u8g2.drawHLine(0, 54, SCREEN_WIDTH);
-  u8g2.setFont(u8g2_font_6x10_tr);
-  char tremorStr[16];
-  snprintf(tremorStr, sizeof(tremorStr), "TREMOR %.2f", tremor);
-  u8g2.drawStr(2, 63, tremorStr);
-  char stressStr[16];
-  snprintf(stressStr, sizeof(stressStr), "STRESS %d%%", stress);
-  u8g2.drawStr(72, 63, stressStr);
-
+  u8g2.drawHLine(0,54,128);
+  char tremorStr[12]; sprintf(tremorStr,"T %.2f",tremor);
+  u8g2.setFont(u8g2_font_5x7_tr);
+  u8g2.drawStr(2,63,tremorStr);
+  char stressStr[12]; sprintf(stressStr,"S %d%%",stress);
+  u8g2.drawStr(92,63,stressStr);
   u8g2.sendBuffer();
 }
 
