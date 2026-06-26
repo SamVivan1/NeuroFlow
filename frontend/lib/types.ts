@@ -25,3 +25,32 @@ export interface SessionStats {
   sampleCount: number;
   peakTremorTime: string | null;
 }
+
+export interface NeuroflowTelemetry {
+  stress_level: number;
+  heart_rate: number;
+  tremor_intensity: number;
+  device_status: string;
+  received_at?: number;
+
+  // Raw MPU6050 accelerometer
+  ax?: number;
+  ay?: number;
+  az?: number;
+
+  // Raw MPU6050 gyroscope
+  gx?: number;
+  gy?: number;
+  gz?: number;
+}
+
+export interface DeviceCommands {
+  haptic_intensity?: 1 | 2 | 3;
+  alerts_enabled?: boolean;
+  tremor_threshold?: number;
+  stress_threshold?: number;
+}
+
+export interface TelemetrySnapshot extends NeuroflowTelemetry {
+  received_at: number;
+}

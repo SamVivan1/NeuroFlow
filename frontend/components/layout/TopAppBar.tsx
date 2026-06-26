@@ -23,7 +23,7 @@ export function TopAppBar({ showConnection = true, rightSlot }: TopAppBarProps) 
       <div className="flex items-center gap-3">
         {showConnection && (
           <div
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full ${
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
               connected
                 ? "bg-secondary-container"
                 : "bg-surface-container-high"
@@ -39,13 +39,13 @@ export function TopAppBar({ showConnection = true, rightSlot }: TopAppBarProps) 
               }`}
             />
             <span
-              className={`text-label-lg font-semibold tracking-wide ${
+              className={`text-label-lg font-semibold tracking-wide hidden sm:inline-block ${
                 connected
                   ? "text-on-secondary-container"
                   : "text-on-surface-variant"
               }`}
             >
-              {connected ? "ESP32 Connected" : "Menunggu ESP32"}
+              {connected ? "ESP32 Connected" : "Device Offline"}
             </span>
           </div>
         )}

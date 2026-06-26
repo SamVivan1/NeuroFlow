@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from "react";
 import type { DeviceCommands, TelemetrySnapshot } from "@/lib/types";
-import { isDeviceConnected } from "@/lib/telemetry-utils";
 
 const MAX_HISTORY = 3600;
 
@@ -26,43 +25,61 @@ const TelemetryContext = createContext<TelemetryContextValue | null>(null);
 export function TelemetryProvider({ children }: { children: ReactNode }) {
   const [telemetry, setTelemetry] = useState<TelemetrySnapshot | null>(null);
   const [history, setHistory] = useState<TelemetrySnapshot[]>([]);
-  const [lastReceivedAt, setLastReceivedAt] = useState<number | null>(null);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const source = new EventSource("/api/telemetry");
+    // Connect to the ML Service WebSocket Gateway
+    // For local QA demo, we point directly to localhost:8000
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws";
+    
+    let ws: WebSocket;
+    let reconnectTimer: NodeJS.Timeout;
 
-    source.onmessage = (event) => {
-      const data = JSON.parse(event.data) as TelemetrySnapshot;
-      setTelemetry(data);
-      setLastReceivedAt(data.received_at);
-      setConnected(true);
-      setHistory((prev) => [...prev.slice(-(MAX_HISTORY - 1)), data]);
+    const connectWS = () => {
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        setConnected(true);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          // Add received_at timestamp since the dummy payload might not have it
+          const snapshot: TelemetrySnapshot = {
+            ...data,
+            received_at: Date.now()
+          };
+          
+          setTelemetry(snapshot);
+          setHistory((prev) => [...prev.slice(-(MAX_HISTORY - 1)), snapshot]);
+        } catch (e) {
+          console.error("Error parsing telemetry", e);
+        }
+      };
+
+      ws.onclose = () => {
+        setConnected(false);
+        // Auto reconnect
+        reconnectTimer = setTimeout(connectWS, 3000);
+      };
+      
+      ws.onerror = () => {
+        ws.close();
+      };
     };
 
-    source.onerror = () => {
-      setConnected(false);
-    };
+    connectWS();
 
-    return () => source.close();
+    return () => {
+      clearTimeout(reconnectTimer);
+      if (ws) ws.close();
+    };
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setConnected(isDeviceConnected(lastReceivedAt));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [lastReceivedAt]);
-
   const sendCommand = useCallback(async (commands: DeviceCommands) => {
-    const response = await fetch("/api/commands", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(commands),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to send command to ESP32");
-    }
+    // Implementation left for MQTT commands
+    console.log("Sending command:", commands);
   }, []);
 
   const value = useMemo(

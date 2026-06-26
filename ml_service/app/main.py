@@ -1,22 +1,88 @@
 import os
+import json
+import asyncio
 from pathlib import Path
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from contextlib import asynccontextmanager
 
+from app.raw_mpu_analyzer import analyze_raw_mpu
+from app.raw_window_model_loader import raw_mpu_window_model
+from app.schemas import RawMpuWindowRequest, RawMpuWindowModelResponse
 from app.model_loader import motor_model
 from app.schemas import FeaturePredictionRequest, FeaturePredictionResponse
 
+from app.database import engine, Base
+from app.mqtt_subscriber import start_mqtt, register_callback
+
+# Create DB tables
+Base.metadata.create_all(bind=engine)
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except Exception:
+                pass
+
+from fastapi.middleware.cors import CORSMiddleware
+
+manager = ConnectionManager()
+
+main_loop = None
+
+# Bridge MQTT to WebSockets
+def mqtt_to_ws_bridge(data: dict):
+    if main_loop is not None and not main_loop.is_closed():
+        asyncio.run_coroutine_threadsafe(manager.broadcast(data), main_loop)
+
+register_callback(mqtt_to_ws_bridge)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global main_loop
+    main_loop = asyncio.get_running_loop()
+    # Startup
+    start_mqtt()
+    yield
+    # Shutdown
 
 app = FastAPI(
     title="NeuroFlow ML Service",
-    description=(
-        "ML inference service untuk baseline Parkinson motor-pattern detector. "
-        "Model ini memakai fitur IMU hasil ekstraksi dari dataset PADS."
-    ),
-    version="0.1.0",
+    description="ML inference service and WebSocket gateway for NeuroFlow.",
+    version="0.2.0",
+    lifespan=lifespan
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive, wait for client messages if any
+            data = await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
 
 @app.get("/health")
 def health_check():
@@ -27,17 +93,14 @@ def health_check():
         "threshold": motor_model.threshold,
     }
 
-
 @app.post("/predict/features", response_model=FeaturePredictionResponse)
 def predict_from_features(payload: FeaturePredictionRequest):
     try:
         result = motor_model.predict(payload.features)
-
         return {
             "subject_id": payload.subject_id,
             **result,
         }
-
     except Exception as exc:
         raise HTTPException(
             status_code=500,
@@ -46,13 +109,6 @@ def predict_from_features(payload: FeaturePredictionRequest):
 
 @app.get("/predict/demo")
 def demo_prediction():
-    """
-    Endpoint khusus development/demo.
-    Mengambil satu sample dari feature CSV lokal, lalu menjalankan inference.
-
-    Catatan:
-    Ini bukan endpoint produksi dan bukan telemetry real-time.
-    """
     feature_csv = Path(
         os.getenv(
             "PADS_FEATURE_CSV",
@@ -65,17 +121,9 @@ def demo_prediction():
     )
 
     if not feature_csv.exists():
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                f"Feature CSV tidak ditemukan: {feature_csv}. "
-                "Copy file pads_motion_features_pd_vs_healthy.csv ke training/data/processed/ "
-                "atau set environment variable PADS_FEATURE_CSV."
-            ),
-        )
+        raise HTTPException(status_code=404, detail="Feature CSV tidak ditemukan.")
 
     df = pd.read_csv(feature_csv)
-
     sample = df.sample(1, random_state=7).iloc[0]
 
     features = {
@@ -90,8 +138,18 @@ def demo_prediction():
         "condition": str(sample["condition"]),
         "true_label": int(sample["label"]),
         **result,
-        "demo_note": (
-            "Demo ini memakai sample dari dataset PADS lokal. "
-            "Belum merepresentasikan telemetry real-time NeuroFlow."
-        ),
+        "demo_note": "Demo ini memakai sample dari dataset PADS lokal.",
     }
+
+@app.post("/predict/raw-mpu-model", response_model=RawMpuWindowModelResponse)
+def predict_raw_mpu_model(payload: RawMpuWindowRequest):
+    try:
+        return raw_mpu_window_model.predict(
+            samples=payload.samples,
+            sampling_rate_hz=payload.sampling_rate_hz,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Raw MPU model inference gagal: {exc}",
+        ) from exc
