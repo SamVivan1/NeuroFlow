@@ -1,3 +1,7 @@
+import os
+from pathlib import Path
+
+import pandas as pd
 from fastapi import FastAPI, HTTPException
 
 from app.model_loader import motor_model
@@ -39,3 +43,55 @@ def predict_from_features(payload: FeaturePredictionRequest):
             status_code=500,
             detail=f"Inference gagal: {exc}",
         ) from exc
+
+@app.get("/predict/demo")
+def demo_prediction():
+    """
+    Endpoint khusus development/demo.
+    Mengambil satu sample dari feature CSV lokal, lalu menjalankan inference.
+
+    Catatan:
+    Ini bukan endpoint produksi dan bukan telemetry real-time.
+    """
+    feature_csv = Path(
+        os.getenv(
+            "PADS_FEATURE_CSV",
+            Path(__file__).resolve().parents[2]
+            / "training"
+            / "data"
+            / "processed"
+            / "pads_motion_features_pd_vs_healthy.csv",
+        )
+    )
+
+    if not feature_csv.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Feature CSV tidak ditemukan: {feature_csv}. "
+                "Copy file pads_motion_features_pd_vs_healthy.csv ke training/data/processed/ "
+                "atau set environment variable PADS_FEATURE_CSV."
+            ),
+        )
+
+    df = pd.read_csv(feature_csv)
+
+    sample = df.sample(1, random_state=7).iloc[0]
+
+    features = {
+        col: float(sample[col])
+        for col in motor_model.feature_columns
+    }
+
+    result = motor_model.predict(features)
+
+    return {
+        "subject_id": str(sample["subject_id"]),
+        "condition": str(sample["condition"]),
+        "true_label": int(sample["label"]),
+        **result,
+        "demo_note": (
+            "Demo ini memakai sample dari dataset PADS lokal. "
+            "Belum merepresentasikan telemetry real-time NeuroFlow."
+        ),
+    }
