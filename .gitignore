@@ -40,3 +40,24 @@ frontend/*.pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 *next-env.d.ts
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+training/data/
+training/reports/
+training/models/*.joblib
+training/models/*.pkl
+training/models/*.keras
+training/models/*.h5
+training/models/*.tflite
+training/models/*.onnx
+
+ml_service/models/*.joblib
+ml_service/models/*.pkl
+
+.env
+.env.local
+node_modules/
+.next/
