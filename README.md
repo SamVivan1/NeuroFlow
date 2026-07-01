@@ -826,3 +826,47 @@ feature/ml-service-pads-baseline-v2
 ```
 
 Branch ini berisi integrasi awal ML service, pipeline raw MPU6050, telemetry frontend, dan baseline Parkinson motor-pattern inference untuk NeuroFlow.
+
+# NeuroFlow: Clinical Biometric Telemetry System
+
+NeuroFlow is an end-to-end edge-to-cloud biometric analysis system designed to monitor motor patterns (tremors) and physiological stress context using the ESP32, MPU6050, and MAX30102 sensors.
+
+## Clinical Interpretation Policy & Limitations
+
+**NeuroFlow is not a medical diagnostic tool.** This system implements a strict, literature-aligned architecture to analyze biometric telemetry safely:
+
+1. **Motor Pattern Analysis**: The MPU6050 accelerometer and gyroscope data is used exclusively for detecting rhythm, energy, and dominant frequencies associated with motor patterns (e.g., 4-6 Hz for Parkinson-like resting tremor, 8-12 Hz for physiologic tremor). 
+2. **Stress Context**: The system **will not** diagnose physiological stress from MPU data alone. Heart Rate (HR) and Heart Rate Variability (HRV - RMSSD, SDNN, pNN50) from the MAX30102 sensor are used as the primary indicators of a physiological stress response.
+3. **Stress-Amplified Tremor**: The system only outputs "Possible stress-amplified tremor" when both a valid narrow-band tremor is detected and physiological stress (elevated HR, low HRV) is actively occurring.
+4. **Motion Artifact Rejection**: High-energy, low-frequency movements (Walking) and high-jerk, broad-spectrum movements (Typing) are strictly gated out. If the system detects these patterns, tremor analysis is suspended for that time window to prevent false positives.
+
+## How to Run the Project
+
+### 1. ESP32 Firmware (Edge Device)
+- Open `firmware/NeuroFlow_Node/NeuroFlow_Node.ino` in the **Arduino IDE**.
+- Install the required libraries: `Adafruit MPU6050`, `MAX30105`, and `PubSubClient`.
+- Update the `ssid` and `password` variables to match your local WiFi network.
+- Flash the code to your ESP32.
+
+### 2. ML Service (Backend)
+The Python FastAPI service handles complex frequency analysis and ML inference.
+```bash
+cd ml_service
+pip install -r requirements.txt
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+### 3. Frontend Dashboard
+The Next.js PWA displays real-time analysis and clinical interpretations.
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 4. Dummy Telemetry (Hardware Simulator)
+If you don't have the physical ESP32 connected, you can run the dummy telemetry script to simulate 7 highly realistic clinical scenarios (Rest, Parkinson Tremor, Anxious Tremor, Typing, Walking, etc.).
+```bash
+cd ml_service
+python dummy_telemetry.py
+```

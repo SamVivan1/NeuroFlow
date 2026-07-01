@@ -25,11 +25,12 @@ def on_message(client, userdata, msg):
         data = json.loads(payload)
         
         tremor_intensity = data.get("tremor_intensity", 0.0)
+        stress_level = data.get("stress_level", 0.0)
         
-        # If the device sends a window of raw MPU samples, run cloud ML inference!
+        # New clinical pipeline: run tremor and stress context if samples exist
         if "samples" in data and isinstance(data["samples"], list):
-            from app.raw_window_model_loader import raw_mpu_window_model
-            from app.schemas import RawMpuSample
+            from app.raw_mpu_analyzer import analyze_tremor_stress_context
+            from app.schemas import TremorStressContextRequest, RawMpuSample
             
             raw_samples = []
             for s in data["samples"]:
@@ -37,34 +38,41 @@ def on_message(client, userdata, msg):
                 
             if len(raw_samples) >= 50:
                 try:
-                    prediction = raw_mpu_window_model.predict(raw_samples, sampling_rate_hz=50.0)
-                    # Use the energy ratio in Parkinson band (4-6Hz) as the tremor intensity, scaled to 100
-                    tremor_intensity = min(100.0, max(0.0, prediction["energy_4_6_ratio"] * 100.0))
+                    req = TremorStressContextRequest(
+                        activity=data.get("activity", "STATIONARY"),
+                        heart_rate=data.get("heart_rate"),
+                        avg_bpm_30s=data.get("avg_bpm_30s"),
+                        rmssd=data.get("rmssd"),
+                        sdnn=data.get("sdnn"),
+                        pnn50=data.get("pnn50"),
+                        sampling_rate_hz=data.get("sampling_rate_hz"),
+                        samples=raw_samples
+                    )
+                    ctx = analyze_tremor_stress_context(req)
+                    
+                    tremor_intensity = ctx.get("tremor_intensity_score", 0)
+                    stress_level = ctx.get("stress_context_score", 0)
+                    
+                    # Append clinical results back into payload for the UI
+                    data["tremor_validity"] = ctx.get("tremor_validity")
+                    data["tremor_intensity_label"] = ctx.get("tremor_intensity_label")
+                    data["tremor_pattern_label"] = ctx.get("tremor_pattern_label")
+                    data["dominant_frequency_hz"] = ctx.get("dominant_frequency_hz")
+                    data["activity_artifact_score"] = ctx.get("activity_artifact_score")
+                    data["stress_context_label"] = ctx.get("stress_context_label")
+                    data["stress_interpretation"] = ctx.get("stress_interpretation")
+                    data["motor_interpretation"] = ctx.get("motor_interpretation")
+                    
+                    # Also append the existing Parkinson motor model if requested
+                    from app.raw_window_model_loader import raw_mpu_window_model
+                    try:
+                        prediction = raw_mpu_window_model.predict(raw_samples, sampling_rate_hz=50.0)
+                        data["parkinson_model_class"] = prediction["predicted_class"]
+                    except Exception:
+                        pass
+                        
                 except Exception as ml_err:
-                    print(f"[MQTT] ML Inference Error: {ml_err}")
-        
-        # Save to DB
-        
-        # 2. Extract physiological features and infer stress using the new Secondary ML Model!
-        stress_level = data.get("stress_level", 0)
-        
-        # If the device sends HRV features, we run true Stress Inference
-        if "rmssd" in data:
-            from app.stress_model_loader import stress_model
-            if stress_model is not None:
-                try:
-                    stress_features = {
-                        "hr": data.get("heart_rate", 60),
-                        "rmssd": data.get("rmssd", 40),
-                        "pnn50": data.get("pnn50", 20),
-                        "sdnn": data.get("sdnn", 50),
-                        "spo2": data.get("spo2", 98)
-                    }
-                    stress_prob = stress_model.predict_stress_probability(stress_features)
-                    # Convert 0.0-1.0 probability to 0-100 percentage
-                    stress_level = int(stress_prob * 100)
-                except Exception as stress_err:
-                    print(f"[MQTT] Stress Inference Error: {stress_err}")
+                    print(f"[MQTT] Clinical Inference Error: {ml_err}")
         
         db = SessionLocal()
         record = TelemetryRecord(
@@ -82,7 +90,6 @@ def on_message(client, userdata, msg):
         db.refresh(record)
         db.close()
         
-        # Add the computed tremor and stress back to the payload before broadcasting
         data["tremor_intensity"] = tremor_intensity
         data["stress_level"] = stress_level
         

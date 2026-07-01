@@ -7,9 +7,9 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from contextlib import asynccontextmanager
 
-from app.raw_mpu_analyzer import analyze_raw_mpu
+from app.raw_mpu_analyzer import analyze_tremor_stress_context
 from app.raw_window_model_loader import raw_mpu_window_model
-from app.schemas import RawMpuWindowRequest, RawMpuWindowModelResponse
+from app.schemas import RawMpuWindowRequest, RawMpuWindowModelResponse, TremorStressContextRequest, TremorStressContextResponse
 from app.model_loader import motor_model
 from app.schemas import FeaturePredictionRequest, FeaturePredictionResponse
 
@@ -153,3 +153,31 @@ def predict_raw_mpu_model(payload: RawMpuWindowRequest):
             status_code=400,
             detail=f"Raw MPU model inference gagal: {exc}",
         ) from exc
+
+
+@app.post("/predict/tremor-stress-context", response_model=TremorStressContextResponse)
+def predict_tremor_stress_context(payload: TremorStressContextRequest):
+    try:
+        # 1. Run the strict heuristic and artifact gating
+        result_dict = analyze_tremor_stress_context(payload)
+        
+        # 2. If valid, run the ML model for Parkinson motor pattern detection
+        model_result = None
+        if len(payload.samples) >= 50:
+            try:
+                model_result = raw_mpu_window_model.predict(
+                    samples=payload.samples,
+                    sampling_rate_hz=payload.sampling_rate_hz,
+                )
+            except Exception:
+                pass # Model fallback
+                
+        result_dict["motor_model_result"] = model_result
+        return TremorStressContextResponse(**result_dict)
+        
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Tremor-Stress Context inference failed: {exc}",
+        ) from exc
+

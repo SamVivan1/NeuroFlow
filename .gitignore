@@ -47,15 +47,20 @@ __pycache__/
 
 training/data/
 training/reports/
-training/models/*.joblib
 training/models/*.pkl
 training/models/*.keras
 training/models/*.h5
 training/models/*.tflite
 training/models/*.onnx
 
-ml_service/models/*.joblib
-ml_service/models/*.pkl
+# Do NOT ignore .joblib or .pt inside ml_service/models/ because they are needed for production!
+!ml_service/models/*.joblib
+!ml_service/models/*.pt
+
+# Arduino/ESP32 Ignore
+firmware/NeuroFlow_ESP32/build/
+*.bin
+*.elf
 
 .env
 .env.local

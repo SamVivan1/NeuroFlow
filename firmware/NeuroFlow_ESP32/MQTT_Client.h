@@ -2,7 +2,6 @@
 #define MQTT_CLIENT_H
 
 #include <WiFi.h>
-#include <WiFiManager.h>
 #include <PubSubClient.h>
 #include "SystemConfig.h"
 
@@ -11,7 +10,6 @@ typedef void (*CommandCallback)(String msg);
 
 class MQTT_Manager {
 private:
-    WiFiManager wifiManager;
     WiFiClient espClient;
     PubSubClient mqttClient;
     

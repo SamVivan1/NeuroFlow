@@ -6,6 +6,7 @@ import { TopAppBar } from "@/components/layout/TopAppBar";
 import { useTelemetry } from "@/context/TelemetryProvider";
 import { StatusCard } from "@/components/widgets/StatusCard";
 import { StressAlertPopup } from "@/components/widgets/StressAlertPopup";
+import { TelemetryChart } from "@/components/widgets/TelemetryChart";
 import {
   buildHrSparkline,
   formatBpm,
@@ -51,54 +52,12 @@ export default function DashboardPage() {
             <span className="text-sm font-semibold text-slate-700">{battery}%</span>
           </div>
         </section>
-   
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Heart Rate Card */}
-          <StatusCard 
-            title="Heart Rate" 
-            value={formatBpm(heartRate)} 
-            unit="BPM" 
-            icon="monitor_heart" 
-            colorClass="text-rose-500 bg-rose-50"
-            subtitle={telemetry ? "Real-time" : "Waiting"}
-          >
-            <div className="w-full h-16 flex items-end gap-1 mt-4 overflow-hidden rounded-md opacity-90 transition-opacity">
-              {sparkline.map((height, i) => {
-                const safeHeight = Math.max(8, Math.min(100, Number(height) || 8));
-                return (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-t-sm ${i === sparkline.length - 1 ? "bg-rose-400" : "bg-rose-200"}`}
-                    style={{ height: `${safeHeight}%` }}
-                  />
-                );
-              })}
-            </div>
-          </StatusCard>
 
-          {/* Tremor Intensity Card */}
-          <StatusCard 
-            title="Tremor Intensity" 
-            value={telemetry ? getTremorLabel(tremor) : "—"} 
-            icon="vibration" 
-            colorClass="text-amber-500 bg-amber-50"
-            subtitle={telemetry ? getTremorStatus(tremor) : "Waiting"}
-          >
-            <div className="mt-4">
-              <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200 inset-shadow-sm">
-                <div
-                  className="bg-gradient-to-r from-teal-400 via-amber-400 to-rose-400 h-full rounded-full transition-all duration-1000 ease-out shadow-sm"
-                  style={{ width: `${telemetry ? tremorToPercent(tremor) : 0}%` }}
-                />
-              </div>
-              <div className="flex justify-between mt-2 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                <span>Low</span>
-                <span>Mod</span>
-                <span>High</span>
-              </div>
-            </div>
-          </StatusCard>
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <TelemetryChart />
+          </div>
 
           {/* Stress Level Card */}
           <StatusCard 

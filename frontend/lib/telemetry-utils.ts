@@ -92,6 +92,23 @@ export function parseTelemetryPayload(rawPayload: string): NeuroflowTelemetry | 
     return {
       stress_level: pickNumber(payload, ["stress_level", "stressLevel", "stress"], 0),
       heart_rate: pickNumber(payload, ["heart_rate", "heartRate", "bpm", "hr"], 0),
+      rmssd: pickNumber(payload, ["rmssd"], 0),
+      sdnn: pickNumber(payload, ["sdnn"], 0),
+      pnn50: pickNumber(payload, ["pnn50"], 0),
+      avg_bpm_30s: pickNumber(payload, ["avg_bpm_30s", "avgBpm30s"], 0),
+      spo2: pickNumber(payload, ["spo2"], 0),
+      battery_pct: pickNumber(payload, ["battery_pct", "batteryPct", "battery"], 100),
+      activity: pickString(payload, ["activity"], "STATIONARY"),
+      condition: pickString(payload, ["condition"], "UNKNOWN"),
+      tremor_validity: pickString(payload, ["tremor_validity"], ""),
+      tremor_intensity_label: pickString(payload, ["tremor_intensity_label"], ""),
+      tremor_pattern_label: pickString(payload, ["tremor_pattern_label"], ""),
+      stress_context_label: pickString(payload, ["stress_context_label"], ""),
+      stress_interpretation: pickString(payload, ["stress_interpretation"], ""),
+      motor_interpretation: pickString(payload, ["motor_interpretation"], ""),
+      parkinson_model_class: pickString(payload, ["parkinson_model_class"], ""),
+      dominant_frequency_hz: pickNumber(payload, ["dominant_frequency_hz"], 0),
+      activity_artifact_score: pickNumber(payload, ["activity_artifact_score"], 0),
       tremor_intensity: pickNumber(
         payload,
         ["tremor_intensity", "tremorIntensity", "tremor", "tremor_score"],
@@ -111,6 +128,9 @@ export function parseTelemetryPayload(rawPayload: string): NeuroflowTelemetry | 
       gx: pickNumber(mpu, ["gx", "gyro_x", "gyroX", "gyroscope_x", "GyroX"], 0),
       gy: pickNumber(mpu, ["gy", "gyro_y", "gyroY", "gyroscope_y", "GyroY"], 0),
       gz: pickNumber(mpu, ["gz", "gyro_z", "gyroZ", "gyroscope_z", "GyroZ"], 0),
+      
+      sampling_rate_hz: pickNumber(payload, ["sampling_rate_hz", "samplingRateHz", "fs"], 0),
+      samples: Array.isArray(payload.samples) ? payload.samples as any[] : undefined,
     };
   } catch {
     return null;

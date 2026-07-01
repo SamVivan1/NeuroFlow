@@ -137,10 +137,24 @@ void loop() {
         int avgBPM = maxManager.getAverageBPM();
         if (displayBPM < 0) displayBPM = (avgBPM > 0) ? avgBPM : 0;
 
-        int calculatedStress = map(displayBPM, 60, 110, 15, 85);
+        int calculatedStress = 0;
+        int currentActivity = mpuManager.getActivityLevel();
+        
+        // Membedakan Olahraga vs Stress berdasarkan pergerakan
+        if (currentActivity == ACTIVITY_LARI || currentActivity == ACTIVITY_JALAN) {
+            // Jika sedang berolahraga, naiknya HR adalah hal wajar (kardiovaskular), BUKAN stress.
+            calculatedStress = map(displayBPM, 60, 140, 5, 20); 
+        } else {
+            // Jika diam (Stationary) tapi HR naik, ini indikasi stress fisiologis/mental!
+            calculatedStress = map(displayBPM, 60, 110, 15, 85);
+            if (displayBPM > 110) calculatedStress = 95;
+        }
         calculatedStress = constrain(calculatedStress, 0, 100);
 
-        float tremorIntensity = mpuManager.getTremorIntensity();
+        float rawTremor = mpuManager.getTremorIntensity();
+        // Scale Tremor: 1.0G = 100 (Violent shake). constrain to 0-100.
+        float scaledTremor = constrain(rawTremor * 100.0f, 0.0f, 100.0f);
+        
         float batteryVolt = readBatteryVoltage();
         int batteryPct = batteryPercent(batteryVolt);
 
@@ -158,7 +172,7 @@ void loop() {
             jsonPayload += "\"heart_rate\":" + String(displayBPM) + ",";
             jsonPayload += "\"avg_bpm_30s\":" + String(avgBPM) + ",";
             jsonPayload += "\"spo2\":" + String(maxManager.getDisplaySpO2(currentTime)) + ",";
-            jsonPayload += "\"tremor_intensity\":" + String(tremorIntensity, 3) + ",";
+            jsonPayload += "\"tremor_intensity\":" + String(scaledTremor, 1) + ",";
             jsonPayload += "\"battery_pct\":" + String(batteryPct) + ",";
             jsonPayload += "\"device_status\":\"ACTIVE\"";
             jsonPayload += "}";
@@ -170,7 +184,7 @@ void loop() {
                      ((WARMUP_MS - (currentTime - maxManager.getFingerDetectedTime())) / 1000) + 1 : 0;
 
         oledDisplay.showMainScreen(networkLabel, batteryVolt, batteryPct, displayBPM, 
-                                   tremorIntensity, calculatedStress, 
+                                   scaledTremor, calculatedStress, 
                                    maxManager.isFingerPresent(), maxManager.isWarmupDone(), remain);
     }
 }

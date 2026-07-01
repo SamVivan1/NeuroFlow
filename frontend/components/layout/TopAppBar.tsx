@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { useTelemetry } from "@/context/TelemetryProvider";
 
@@ -13,11 +14,19 @@ export function TopAppBar({ showConnection = true, rightSlot }: TopAppBarProps) 
 
   return (
     <header className="bg-surface shadow-sm fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-gutter py-4">
-      <div className="flex items-center gap-3">
-        <Icon name="signal_cellular_alt" className="text-primary text-3xl" />
-        <h1 className="font-display text-headline-md text-primary font-semibold">
-          NeuroFlow
-        </h1>
+      <div className="flex items-center gap-6">
+        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Icon name="signal_cellular_alt" className="text-primary text-3xl" />
+          <h1 className="font-display text-headline-md text-primary font-semibold">
+            NeuroFlow
+          </h1>
+        </Link>
+        <nav className="hidden md:flex items-center gap-4 text-sm font-medium text-on-surface-variant ml-4">
+          <Link href="/" className="hover:text-primary transition-colors">Dashboard</Link>
+          <Link href="/breathe" className="hover:text-primary transition-colors">Therapy</Link>
+          <Link href="/reports" className="hover:text-primary transition-colors">Reports</Link>
+          <Link href="/settings" className="hover:text-primary transition-colors">Settings</Link>
+        </nav>
       </div>
 
       <div className="flex items-center gap-3">

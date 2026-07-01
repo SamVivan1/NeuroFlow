@@ -1,151 +1,107 @@
 "use client";
 
-import { useState } from "react";
-
-type MotorPatternResponse = {
-  subject_id: string;
-  condition: string;
-  true_label: number;
-  model_name: string;
-  score: number;
-  threshold: number;
-  predicted_label: number;
-  predicted_class: string;
-  interpretation: string;
-  missing_feature_count: number;
-  extra_feature_count: number;
-  demo_note: string;
-};
+import { useTelemetry } from "@/context/TelemetryProvider";
+import { Icon } from "@/components/Icon";
 
 export default function MotorPatternCard() {
-  const [data, setData] = useState<MotorPatternResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { telemetry, connected } = useTelemetry();
 
-  async function runDemoInference() {
-    setLoading(true);
-    setErrorMessage(null);
-
-    try {
-      const response = await fetch("/api/ml/motor-pattern/demo", {
-        method: "GET",
-        cache: "no-store",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          typeof result?.detail === "string"
-            ? result.detail
-            : result?.error ?? "ML inference failed",
-        );
-      }
-
-      setData(result);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "Unknown error",
-      );
-    } finally {
-      setLoading(false);
-    }
+  if (!telemetry || !connected) {
+    return (
+      <section className="border border-slate-300/30 rounded-2xl p-5 mt-4 bg-slate-50/50">
+        <h2 className="m-0 text-lg font-bold">Clinical Interpretation</h2>
+        <p className="mt-2 text-sm text-slate-500">Waiting for device telemetry to begin analysis...</p>
+      </section>
+    );
   }
 
-  const isParkinsonPattern = data?.predicted_label === 1;
+  const {
+    tremor_validity,
+    tremor_intensity_label,
+    tremor_pattern_label,
+    dominant_frequency_hz,
+    activity_artifact_score,
+    stress_context_label,
+    stress_interpretation,
+    motor_interpretation,
+    parkinson_model_class,
+  } = telemetry;
+
+  const isArtifact = tremor_validity === "invalid";
+  const artifactScoreStr = activity_artifact_score ? (activity_artifact_score * 100).toFixed(0) + "%" : "0%";
+  const freqStr = dominant_frequency_hz ? dominant_frequency_hz.toFixed(1) + " Hz" : "—";
 
   return (
-    <section
-      style={{
-        border: "1px solid rgba(148, 163, 184, 0.35)",
-        borderRadius: "18px",
-        padding: "18px",
-        marginTop: "18px",
-        background: "rgba(15, 23, 42, 0.04)",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700 }}>
-            Motor Pattern Analysis
-          </h2>
-          <p style={{ margin: "6px 0 0", fontSize: "13px", opacity: 0.75 }}>
-            Baseline ML detector dari dataset PADS. Bukan diagnosis final dan belum stress-tremor classifier.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={runDemoInference}
-          disabled={loading}
-          style={{
-            border: "0",
-            borderRadius: "12px",
-            padding: "10px 14px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontWeight: 700,
-          }}
-        >
-          {loading ? "Analyzing..." : "Run Demo"}
-        </button>
+    <section className="border border-slate-300/50 rounded-3xl p-6 mt-4 bg-white shadow-sm relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-8 opacity-[0.03] text-teal-900 pointer-events-none">
+        <Icon name="biotech" className="text-8xl scale-125" />
       </div>
 
-      {errorMessage && (
-        <p style={{ marginTop: "14px", color: "#b91c1c", fontSize: "14px" }}>
-          {errorMessage}
-        </p>
-      )}
-
-      {data && (
-        <div style={{ marginTop: "16px", display: "grid", gap: "10px" }}>
-          <div
-            style={{
-              borderRadius: "14px",
-              padding: "14px",
-              background: isParkinsonPattern
-                ? "rgba(239, 68, 68, 0.10)"
-                : "rgba(34, 197, 94, 0.10)",
-            }}
-          >
-            <div style={{ fontSize: "13px", opacity: 0.75 }}>
-              Prediction
-            </div>
-            <div style={{ fontSize: "20px", fontWeight: 800 }}>
-              {data.predicted_class}
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-            <InfoBox label="Score" value={data.score.toFixed(4)} />
-            <InfoBox label="Threshold" value={data.threshold.toFixed(4)} />
-            <InfoBox label="Model" value={data.model_name} />
-            <InfoBox label="Subject" value={`${data.subject_id} (${data.condition})`} />
-          </div>
-
-          <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.5 }}>
-            {data.interpretation}
-          </p>
-
-          <p style={{ margin: 0, fontSize: "12px", opacity: 0.7 }}>
-            {data.demo_note}
-          </p>
+      <div className="relative z-10">
+        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <Icon name="psychology" className="text-teal-600" />
+          Clinical Analysis
+        </h2>
+        
+        <div className="mt-3 text-xs font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 inline-block mb-4">
+          ⚠️ Not a medical diagnosis. HRV used for context.
         </div>
-      )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InfoBox 
+            label="Motor Pattern" 
+            value={parkinson_model_class || tremor_pattern_label || "Normal"} 
+            highlight={parkinson_model_class === "Parkinson-like Pattern" ? "danger" : "normal"}
+          />
+          <InfoBox 
+            label="Stress Context" 
+            value={stress_context_label || "Normal"} 
+            highlight={stress_context_label?.includes("amplified") ? "warning" : "normal"}
+          />
+          <InfoBox label="Tremor Intensity" value={tremor_intensity_label || "No Tremor"} />
+          <InfoBox label="Dominant Frequency" value={freqStr} />
+          
+          <div className="col-span-1 sm:col-span-2">
+            <InfoBox 
+              label="Artifact Gating" 
+              value={isArtifact ? "Motion Artifact Detected (Analysis Suspended)" : "Valid Stationary Window"} 
+              highlight={isArtifact ? "danger" : "success"}
+            />
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <h4 className="text-xs uppercase font-bold text-slate-400 mb-1">Motor Interpretation</h4>
+            <p className="text-sm font-medium text-slate-700 leading-relaxed">
+              {motor_interpretation || "Awaiting sufficient data..."}
+            </p>
+          </div>
+          
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <h4 className="text-xs uppercase font-bold text-slate-400 mb-1">Stress Interpretation</h4>
+            <p className="text-sm font-medium text-slate-700 leading-relaxed">
+              {stress_interpretation || "Awaiting sufficient data..."}
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
 
-function InfoBox({ label, value }: { label: string; value: string }) {
+function InfoBox({ label, value, highlight = "normal" }: { label: string; value: string; highlight?: "normal" | "danger" | "warning" | "success" }) {
+  const bgColors = {
+    normal: "bg-slate-50 border-slate-200 text-slate-800",
+    danger: "bg-rose-50 border-rose-200 text-rose-800",
+    warning: "bg-amber-50 border-amber-200 text-amber-800",
+    success: "bg-teal-50 border-teal-200 text-teal-800",
+  };
+
   return (
-    <div
-      style={{
-        border: "1px solid rgba(148, 163, 184, 0.25)",
-        borderRadius: "12px",
-        padding: "10px",
-      }}
-    >
-      <div style={{ fontSize: "12px", opacity: 0.65 }}>{label}</div>
-      <div style={{ fontSize: "14px", fontWeight: 700 }}>{value}</div>
+    <div className={`border rounded-xl p-3 ${bgColors[highlight]}`}>
+      <div className="text-[11px] uppercase font-bold opacity-60 mb-1 tracking-wider">{label}</div>
+      <div className="text-sm font-semibold">{value}</div>
     </div>
   );
 }

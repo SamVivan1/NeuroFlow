@@ -9,18 +9,25 @@ MQTT_Manager::MQTT_Manager() : mqttClient(espClient), lastMqttConnectAttempt(0),
 
 bool MQTT_Manager::setupWiFi() {
     delay(10);
-    Serial.println("\n[WiFi] Menghubungkan...");
+    Serial.println("\n[WiFi] Menghubungkan ke " + String(WIFI_SSID) + "...");
     
     WiFi.mode(WIFI_STA);
-    wifiManager.setConfigPortalTimeout(180);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    
+    int retries = 0;
+    while (WiFi.status() != WL_CONNECTED && retries < 20) {
+        delay(500);
+        Serial.print(".");
+        retries++;
+    }
 
-    if (!wifiManager.autoConnect("NeuroFlow-AP")) {
-        Serial.println("\n[WiFi] Gagal, restart...");
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("\n[WiFi] Gagal connect ke WiFi lokal, restart...");
         delay(3000);
         ESP.restart();
         return false;
     }
-    Serial.println("\n[WiFi] Connected!");
+    Serial.println("\n[WiFi] Connected! IP: " + WiFi.localIP().toString());
     return true;
 }
 

@@ -3,7 +3,10 @@
 
 // ==================== CONFIGURATION ====================
 
-// WiFi & MQTT settings are typically loaded dynamically (WiFiManager) 
+#define WIFI_SSID "CutAdek"
+#define WIFI_PASSWORD "harilibur"
+
+
 // but we set constants for defaults here.
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
@@ -25,8 +28,8 @@
 
 // Activity & Tremor Constants
 #define ACTIVITY_WINDOW_SIZE 50
-#define STD_THRESHOLD_JALAN 0.06f
-#define STD_THRESHOLD_LARI 0.25f
+#define STD_THRESHOLD_JALAN 0.35f
+#define STD_THRESHOLD_LARI 0.85f
 #define DEFAULT_TREMOR_THRESHOLD 0.40f
 
 // MAX30102 Constants
