@@ -1,38 +1,100 @@
-import {
-  ensureConnected,
-  subscribeTelemetry,
-} from "@/lib/mqtt-bridge";
-import type { NeuroflowTelemetry } from "@/lib/types";
+import { NextRequest } from "next/server";
+import { getLatestTelemetry } from "@/lib/mqtt-bridge";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-export async function GET() {
-  await ensureConnected();
-
+export async function GET(request: NextRequest) {
   const encoder = new TextEncoder();
-  let unsubscribe: (() => void) | null = null;
 
+  let isClosed = false;
+  let telemetryInterval: ReturnType<typeof setInterval> | null = null;
+  let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
+
+  const fallbackTelemetry = {
+  stress_level: 0,
+  heart_rate: 0,
+  tremor_intensity: 0,
+  device_status: "disconnected",
+  received_at: Date.now(),
+
+  ax: 0,
+  ay: 0,
+  az: 0,
+  gx: 0,
+  gy: 0,
+  gz: 0,
+};
   const stream = new ReadableStream({
     start(controller) {
-      const send = (data: NeuroflowTelemetry) => {
-        const payload = JSON.stringify({
-          ...data,
+      function cleanup() {
+        if (isClosed) return;
+
+        isClosed = true;
+
+        if (telemetryInterval) {
+          clearInterval(telemetryInterval);
+          telemetryInterval = null;
+        }
+
+        if (keepAliveInterval) {
+          clearInterval(keepAliveInterval);
+          keepAliveInterval = null;
+        }
+
+        try {
+          controller.close();
+        } catch {
+          // Client may already have closed the stream.
+        }
+      }
+
+      function safeEnqueue(payload: string) {
+        if (isClosed) return;
+
+        try {
+          controller.enqueue(encoder.encode(payload));
+        } catch {
+          cleanup();
+        }
+      }
+
+      function sendTelemetry() {
+        const telemetry = getLatestTelemetry();
+
+        const payload = telemetry ?? {
+          ...fallbackTelemetry,
           received_at: Date.now(),
-        });
-        controller.enqueue(encoder.encode(`data: ${payload}\n\n`));
-      };
+        };
 
-      unsubscribe = subscribeTelemetry(send);
+        safeEnqueue(`data: ${JSON.stringify(payload)}\n\n`);
+      }
 
-      const keepAlive = setInterval(() => {
-        controller.enqueue(encoder.encode(": keepalive\n\n"));
+      sendTelemetry();
+
+      telemetryInterval = setInterval(() => {
+        sendTelemetry();
+      }, 1000);
+
+      keepAliveInterval = setInterval(() => {
+        safeEnqueue(": keepalive\n\n");
       }, 15000);
 
-      (controller as { _keepAlive?: ReturnType<typeof setInterval> })._keepAlive =
-        keepAlive;
+      request.signal.addEventListener("abort", cleanup);
     },
+
     cancel() {
-      unsubscribe?.();
+      isClosed = true;
+
+      if (telemetryInterval) {
+        clearInterval(telemetryInterval);
+        telemetryInterval = null;
+      }
+
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+        keepAliveInterval = null;
+      }
     },
   });
 

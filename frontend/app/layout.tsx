@@ -27,7 +27,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full bg-background text-on-background pb-32">
+      <body className="min-h-full bg-background text-on-background pb-20">
         <TelemetryProvider>
           {children}
           <BottomNav />
