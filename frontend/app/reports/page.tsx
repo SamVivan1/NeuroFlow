@@ -15,19 +15,20 @@ function buildChartPaths(history: ReturnType<typeof useTelemetry>["history"]) {
   }
 
   const toY = (value: number, max: number) => 95 - (value / max) * 70;
+  const toNumber = (value: number | undefined, fallback: number) => value ?? fallback;
 
-  const maxHr = Math.max(...recent.map((h) => h.heart_rate), 1);
-  const maxTremor = Math.max(...recent.map((h) => h.tremor_intensity), 0.01);
+  const maxHr = Math.max(...recent.map((h) => toNumber(h.heart_rate, 0)), 1);
+  const maxTremor = Math.max(...recent.map((h) => toNumber(h.tremor_intensity, 0)), 0.01);
 
   const hrPoints = recent.map((h, i) => {
     const x = (i / (recent.length - 1)) * 100;
-    const y = toY(h.heart_rate, maxHr);
+    const y = toY(toNumber(h.heart_rate, 0), maxHr);
     return `${i === 0 ? "M" : "L"}${x},${y}`;
   });
 
   const tremorPoints = recent.map((h, i) => {
     const x = (i / (recent.length - 1)) * 100;
-    const y = toY(h.tremor_intensity, maxTremor);
+    const y = toY(toNumber(h.tremor_intensity, 0), maxTremor);
     return `${i === 0 ? "M" : "L"}${x},${y}`;
   });
 

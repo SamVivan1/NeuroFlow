@@ -27,11 +27,16 @@ export function TelemetryChart() {
   }
 
   // Format data for Recharts
-  const chartData = history.map((point) => ({
-    time: format(new Date(point.received_at), "HH:mm:ss"),
-    hr: point.heart_rate > 0 ? point.heart_rate : null,
-    tremor: point.tremor_intensity > 0 ? point.tremor_intensity : 0,
-  }));
+  const chartData = history.map((point) => {
+    const heartRate = point.heart_rate ?? 0;
+    const tremor = point.tremor_intensity ?? 0;
+
+    return {
+      time: format(new Date(point.received_at ?? Date.now()), "HH:mm:ss"),
+      hr: heartRate > 0 ? heartRate : null,
+      tremor: tremor > 0 ? tremor : 0,
+    };
+  });
 
   return (
     <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col gap-8">

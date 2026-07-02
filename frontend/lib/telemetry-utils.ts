@@ -226,8 +226,10 @@ export function buildHrSparkline(
   limit = 24,
 ): number[] {
   const values = history
-    .map((item) => item.heart_rate)
-    .filter((value) => Number.isFinite(value) && value > 0)
+    .flatMap((item) => {
+      const value = item.heart_rate;
+      return typeof value === "number" && Number.isFinite(value) && value > 0 ? [value] : [];
+    })
     .slice(-limit);
 
   if (values.length === 0) {
