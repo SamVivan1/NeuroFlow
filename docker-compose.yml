@@ -12,6 +12,7 @@ services:
       - NODE_ENV=production
       - NODE_OPTIONS=--max-old-space-size=256
     restart: unless-stopped
+    network_mode: host
     
     # Memory and CPU limits for 512MB constraint
     deploy:
@@ -57,10 +58,5 @@ services:
   #       limits:
   #         cpus: '0.5'
   #         memory: 128M
-
-networks:
-  default:
-    name: neuroflow-network
-    driver: bridge
 
 volumes: {}
