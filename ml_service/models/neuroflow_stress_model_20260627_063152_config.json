@@ -1,0 +1,18 @@
+{
+    "model_name": "NeuroFlow Stress RandomForest v1",
+    "model_path": "neuroflow_stress_model_20260627_063152.pkl",
+    "feature_columns": [
+        "hr",
+        "rmssd",
+        "pnn50",
+        "sdnn",
+        "spo2"
+    ],
+    "threshold": 0.5,
+    "classes": {
+        "0": "Relaxed",
+        "1": "Stressed"
+    },
+    "accuracy": 0.996,
+    "trained_on": "20260627_063152"
+}
