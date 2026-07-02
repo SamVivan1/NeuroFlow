@@ -5,12 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: neuroflow-frontend
     ports:
-      - "3004:3000"
+      - "3004:3000" # Sekarang ini akan berfungsi dengan benar
     environment:
       - NODE_ENV=production
       - NODE_OPTIONS=--max-old-space-size=256
     restart: unless-stopped
-    network_mode: host
+    
+    # HAPUS ATAU KOMENTARI BARIS INI:
+    # network_mode: host
     
     # Memory and CPU limits for 512MB constraint
     deploy:
@@ -22,7 +24,7 @@ services:
           cpus: '0.5'
           memory: 256M
     
-    # Health check
+    # Health check (Tetap di port 3000 karena di dalam kontainer aplikasinya memakai port 3000)
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
@@ -36,25 +38,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    
-    # Optional: MQTT broker (if running locally)
-    # depends_on:
-    #   - mqtt-broker
-
-  # Optional: Uncomment if you want to run MQTT broker locally
-  # mqtt-broker:
-  #   image: eclipse-mosquitto:2-alpine
-  #   container_name: neuroflow-mqtt
-  #   ports:
-  #     - "1883:1883"
-  #     - "9001:9001"
-  #   volumes:
-  #     - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-  #   restart: unless-stopped
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '0.5'
-  #         memory: 128M
-
-volumes: {}
