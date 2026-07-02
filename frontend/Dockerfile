@@ -47,4 +47,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start app with memory limit
-CMD ["node", "--max-old-space-size=256", "node_modules/.bin/next", "start", "-p", "3000"]
+CMD ["sh", "-c", "node --max-old-space-size=256 node_modules/.bin/next start -p ${PORT:-3004}"]
