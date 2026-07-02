@@ -5,16 +5,14 @@ services:
       dockerfile: Dockerfile
     container_name: neuroflow-frontend
     ports:
-      - "3004:3000" # Sekarang ini akan berfungsi dengan benar
+      - "3004:3000"
     environment:
       - NODE_ENV=production
       - NODE_OPTIONS=--max-old-space-size=256
     restart: unless-stopped
+    networks:
+      - neuroflow_net # Hubungkan servis ke jaringan kustom di bawah
     
-    # HAPUS ATAU KOMENTARI BARIS INI:
-    # network_mode: host
-    
-    # Memory and CPU limits for 512MB constraint
     deploy:
       resources:
         limits:
@@ -24,7 +22,6 @@ services:
           cpus: '0.5'
           memory: 256M
     
-    # Health check (Tetap di port 3000 karena di dalam kontainer aplikasinya memakai port 3000)
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
@@ -32,9 +29,16 @@ services:
       retries: 3
       start_period: 40s
     
-    # Logging configuration
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+# Definisikan jaringan kustom dengan subnet manual di bagian paling bawah
+networks:
+  neuroflow_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.144.0/24
